@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f5f5;
+  --foreground: #171717;
+  
+  /* Flowd Custom Colors */
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --panel-bg: rgba(245, 245, 245, 0.85);
+  --chat-bg: rgba(230, 230, 230, 0.9);
+  
+  /* Card Colors - 严格按图1配色 */
+  --decided-bg: #3d3d3d;
+  --decided-text: #ffffff;
+  --todo-bg: #2d4a4a;
+  --todo-text: #ffffff;
+  --question-bg: #e8e4d4;
+  --question-text: #854d0e;
+  --note-bg: #f5f3f0;
+  --note-text: #374151;
+  --doc-bg: #ffffff;
+  --doc-text: #374151;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 50%, #c8c8c8 100%);
+  min-height: 100vh;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* Glassmorphism Effect */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.glass-chat {
+  background: var(--chat-bg);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Card Styles - 严格按图1配色 */
+.card-decided {
+  background: var(--decided-bg);
+  color: var(--decided-text);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-todo {
+  background: var(--todo-bg);
+  color: var(--todo-text);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-question {
+  background: var(--question-bg);
+  color: var(--question-text);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.card-note {
+  background: var(--note-bg);
+  color: var(--note-text);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.card-doc {
+  background: var(--doc-bg);
+  color: var(--doc-text);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Virtual Pet Animations */
+@keyframes pet-walk {
+  0% { transform: translateX(-50px) scaleX(1); }
+  49% { transform: translateX(50px) scaleX(1); }
+  50% { transform: translateX(50px) scaleX(-1); }
+  99% { transform: translateX(-50px) scaleX(-1); }
+  100% { transform: translateX(-50px) scaleX(1); }
+}
+
+@keyframes pet-bounce {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -10px; }
+}
+
+.animate-pet-walk {
+  animation: pet-walk 3s infinite linear, pet-bounce 0.4s infinite ease-in-out;
+}
+
+@keyframes pet-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-pet-idle {
+  animation: pet-idle 2s infinite ease-in-out;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Typing Indicator */
+.typing-dot {
+  animation: typing 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}

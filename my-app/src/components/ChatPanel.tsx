@@ -609,14 +609,15 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
         // 调用后端搜索接口获取真实数据
         try {
           const res = await fetch('/api/feishu/search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: userInput,
-              project: { name: projectName },
-              // In real app, we get this from props or store. Assuming feishuConfig is passed or fetched.
-              // For demonstration, we'll try to get it from window.feishuConfig (set when project bound)
-              feishuConfig: (window as any).__currentProjectFeishuConfig || {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query: userInput,
+                project: { name: projectName },
+                isSemantic: true, // 开启轻量化 RAG 语义检索
+                // In real app, we get this from props or store. Assuming feishuConfig is passed or fetched.
+                // For demonstration, we'll try to get it from window.feishuConfig (set when project bound)
+                feishuConfig: (window as any).__currentProjectFeishuConfig || {
                 appToken: 'F49FbA8Yha2eX6ssqYecx1tknEd', // Example fallback
                 tableId: 'tblXXX'
               }
@@ -687,8 +688,35 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
 
       const isTaskQuery = isAskingForTasks(userInput);
       
+      // 1. 如果用户的问题比较长，或者主动提问，我们在发给 LLM 之前先查一下本地/飞书上下文 (RAG 注入)
+      let injectedContext = '';
+      if (!isTaskQuery && userInput.length > 5) {
+        try {
+          const res = await fetch('/api/feishu/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: userInput,
+              project: { name: projectName },
+              isSemantic: true,
+              feishuConfig: (window as any).__currentProjectFeishuConfig
+            })
+          });
+          const data = await res.json();
+          if (data.success && data.results?.length > 0) {
+            injectedContext = `\n\n[来自轻量化 RAG 的历史思考资产]:\n${data.results.map((r:any) => `- 轮次 ${r.round || 1} 的 ${r.category}: ${r.title}。内容摘要: ${r.summary}`).join('\n')}\n(提示: 你可以引用这些历史内容并标注“来自 Round X”以强化跨轮次记忆)`;
+          }
+        } catch (e) {
+          console.error('RAG context injection failed', e);
+        }
+      }
+
       let systemPrompt = `你是 Flowd AI，一个嵌入在项目中的思考伙伴。\n\n你的工作是帮助用户思考——而不是替他们思考。你 surface what they haven't noticed. 你 connect what they haven't connected. 当用户卡住时，你问那个能推动事情前进的问题。\n\n保持直接、具体、诚实的风格。短句，没有废话。`;
       
+      if (injectedContext) {
+        systemPrompt += injectedContext;
+      }
+
       if (isTaskQuery) {
         systemPrompt = `你是 Flowd AI，一个嵌入在项目中的思考伙伴。
 用户正在询问项目进度或下一步的待办事项。

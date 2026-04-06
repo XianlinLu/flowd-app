@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFeishuClient } from '@/lib/feishu-client';
 import { Card } from '@/types/board';
+import { generateEmbedding } from '@/lib/embeddings';
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,6 +29,9 @@ export async function POST(request: NextRequest) {
       documentUrl = docResult.url;
     }
 
+    // Generate Embedding for RAG search
+    const vectorString = JSON.stringify(await generateEmbedding(`${card.title}\n${card.content}`));
+
     // Prepare fields for Bitable
     const fields: any = {
       "项目ID": project.id,
@@ -37,6 +41,7 @@ export async function POST(request: NextRequest) {
       "内容摘要": card.content.substring(0, 100) + (card.content.length > 100 ? '...' : ''),
       "检索关键词": card.metadata?.tags?.join(', ') || '',
       "飞书文档链接": documentUrl ? { link: documentUrl, text: '查看文档' } : null,
+      "向量特征": vectorString, // Store vector in Feishu Bitable (needs text field "向量特征")
       "生成时间": card.createdAt
     };
 

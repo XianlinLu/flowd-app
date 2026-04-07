@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { AISuggestion, ContentCategory, Card } from '@/types/board';
 import { boardStore } from '@/lib/board-store';
+import { FLOWD_SYSTEM_PROMPT } from '@/lib/prompts';
 import { DragContext, extractNewCardsFromResponse } from '@/lib/drag-context';
 import { DropZone } from './DropZone';
 import { CardDropAction } from './CardDropAction';
@@ -714,7 +715,7 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
         }
       }
 
-      let systemPrompt = `你是 Flowd AI，一个嵌入在项目中的思考伙伴。\n\n你的工作是帮助用户思考——而不是替他们思考。你 surface what they haven't noticed. 你 connect what they haven't connected. 当用户卡住时，你问那个能推动事情前进的问题。\n\n保持直接、具体、诚实的风格。短句，没有废话。`;
+      let systemPrompt = FLOWD_SYSTEM_PROMPT;
       
       if (injectedContext) {
         systemPrompt += injectedContext;

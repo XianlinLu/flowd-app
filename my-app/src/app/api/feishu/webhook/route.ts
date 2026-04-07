@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getFeishuClient } from '@/lib/feishu-client';
 import { retrieveRelevantContext } from '@/lib/rag/retriever';
 import { getLLMClient } from '@/lib/llm-client';
+import { FLOWD_SYSTEM_PROMPT } from '@/lib/prompts';
 
 export async function POST(request: Request) {
   try {
@@ -78,7 +79,7 @@ async function processBotMessage(messageId: string, query: string) {
   }
 
   // 2. Build LLM Prompt
-  let systemPrompt = `你是 Flowd AI，一个接入在飞书机器人中的思考伙伴。保持直接、具体、诚实的风格。短句，没有废话。`;
+  let systemPrompt = FLOWD_SYSTEM_PROMPT;
   if (injectedContext) {
     systemPrompt += injectedContext;
   }

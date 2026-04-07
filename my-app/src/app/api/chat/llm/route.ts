@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ChatRequest, Message } from '@/types/chat';
 import { getLLMClient } from '@/lib/llm-client';
 import { sessionManager } from '@/lib/session-manager';
-import { getContextualPrompt } from '@/lib/prompts';
+import { FLOWD_SYSTEM_PROMPT } from '@/lib/prompts';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,11 +34,7 @@ export async function POST(request: NextRequest) {
       }
 
       const sessionMessages = sessionManager.getMessages(session.id);
-      const contextualSystemPrompt = getContextualPrompt({
-        workspaceName: session.metadata?.workspaceName,
-        cardCount: session.metadata?.cardCount,
-        openQuestions: session.metadata?.openQuestions,
-      });
+      const contextualSystemPrompt = FLOWD_SYSTEM_PROMPT;
 
       allMessages = [
         {

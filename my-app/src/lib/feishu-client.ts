@@ -98,6 +98,16 @@ export class FeishuClient {
     return response.json();
   }
 
+  async replyMessage(messageId: string, content: string): Promise<any> {
+    return this.request(`/im/v1/messages/${messageId}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({
+        content: JSON.stringify({ text: content }),
+        msg_type: 'text',
+      }),
+    });
+  }
+
   // Document Operations
   async createDocument(title: string, content?: string, folderToken?: string): Promise<FeishuDocument> {
     const response = await this.request('/docx/v1/documents', {

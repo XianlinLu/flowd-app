@@ -612,11 +612,10 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
+                projectId: 'flowd_mock_project', // Mock ID for testing
                 query: userInput,
-                project: { name: projectName },
+                currentRound: 1, // Mock round
                 isSemantic: true, // 开启轻量化 RAG 语义检索
-                // In real app, we get this from props or store. Assuming feishuConfig is passed or fetched.
-                // For demonstration, we'll try to get it from window.feishuConfig (set when project bound)
                 feishuConfig: (window as any).__currentProjectFeishuConfig || {
                 appToken: 'F49FbA8Yha2eX6ssqYecx1tknEd', // Example fallback
                 tableId: 'tblXXX'
@@ -696,10 +695,14 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              projectId: 'flowd_mock_project', // Mock ID
               query: userInput,
-              project: { name: projectName },
+              currentRound: 1,
               isSemantic: true,
-              feishuConfig: (window as any).__currentProjectFeishuConfig
+              feishuConfig: (window as any).__currentProjectFeishuConfig || {
+                appToken: 'F49FbA8Yha2eX6ssqYecx1tknEd',
+                tableId: 'tblXXX'
+              }
             })
           });
           const data = await res.json();

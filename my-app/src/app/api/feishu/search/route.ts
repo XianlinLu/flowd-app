@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       pageSize: 100 
     });
 
-    let formattedResults = records.map(r => ({
+    let formattedResults: any[] = records.map(r => ({
       id: r.recordId,
       title: r.fields['卡片标题'],
       category: r.fields['卡片类型'],

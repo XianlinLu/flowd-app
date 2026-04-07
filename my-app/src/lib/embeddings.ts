@@ -17,7 +17,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     // Trim text to avoid exceeding token limits for embedding models
     const trimmedText = text.substring(0, 8000);
     const response = await openai.embeddings.create({
-      model: 'text-embedding-3-small', // Standard lightweight embedding model
+      model: 'BAAI/bge-m3', // SiliconFlow 高性能开源多语言特征模型
       input: trimmedText,
     });
     return response.data[0].embedding;

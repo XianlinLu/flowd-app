@@ -18,6 +18,7 @@ export default function Home() {
 
   // Sidebar and Project State
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentProjectId, setCurrentProjectId] = useState('1');
 
@@ -156,8 +157,29 @@ export default function Home() {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, name: newName } : p));
   }, []);
 
-  const handleBindFeishu = useCallback((id: string, feishuConfig: any) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, feishuConfig } : p));
+  const handleBindFeishu = useCallback(async (id: string, feishuConfig: any) => {
+    let tableName = '飞书多维表格';
+    if (feishuConfig?.appToken) {
+      try {
+        const res = await fetch(`/api/feishu/bitable?app_token=${feishuConfig.appToken}`);
+        const data = await res.json();
+        
+        if (!res.ok || data.error) {
+          console.error('Failed to fetch bitable info:', data.error);
+          alert(`绑定失败: ${data.error || '获取多维表格信息失败，请检查 App Token 是否正确'}`);
+          throw new Error(data.error || 'Failed to fetch bitable info');
+        }
+        
+        if (data.name) {
+          tableName = data.name;
+        }
+      } catch (e) {
+        console.error('Failed to fetch bitable info', e);
+        throw e;
+      }
+    }
+    
+    setProjects(prev => prev.map(p => p.id === id ? { ...p, feishuConfig, feishuTableName: tableName } : p));
     if (id === currentProjectId) {
       (window as any).__currentProjectFeishuConfig = feishuConfig;
     }
@@ -224,21 +246,24 @@ export default function Home() {
         isPetVisible={isPetVisible}
       />
 
-      {/* Left Side - Board Panel (较小比例) */}
-      <div className="w-[380px] flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30">
+      {/* Left Side - Board Panel */}
+      <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-500 ease-in-out ${isChatOpen ? 'w-[380px]' : 'flex-1 w-full'}`}>
         <LeftPanel 
           key={`left-${currentProjectId}`}
           projectName={currentProject?.name || '新项目'}
+          isFeishuSynced={!!currentProject?.feishuConfig?.appToken}
           onCardCountChange={setCardCount}
           onCardUpdate={handleCardUpdate}
           onCardDelete={handleCardDelete}
           onCardChat={handleCardChat}
           onNewProject={handleNewProject}
+          feishuTableName={currentProject?.feishuTableName}
+          isExpanded={!isChatOpen}
         />
       </div>
 
       {/* Right Side - Chat Panel (占大部分) */}
-      <div className="flex-1 bg-[#C1C9CC] p-4 pl-0">
+      <div className={`bg-[#C1C9CC] transition-all duration-500 ease-in-out overflow-hidden ${isChatOpen ? 'flex-1 p-4 pl-0 opacity-100' : 'w-0 p-0 opacity-0'}`}>
         <div className="h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-sm border border-white/40">
           <ChatPanel 
           key={`chat-${currentProjectId}`}
@@ -249,9 +274,20 @@ export default function Home() {
           onProjectRename={(newName) => handleRenameProject(currentProjectId, newName)}
           isPetVisible={isPetVisible}
           onSetPetVisible={setIsPetVisible}
+          onClose={() => setIsChatOpen(false)}
         />
         </div>
       </div>
+
+      {/* Floating Logo to reopen chat */}
+      {!isChatOpen && (
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="fixed bottom-8 right-8 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 z-50 overflow-hidden border border-gray-200"
+        >
+          <img src="/logo.png" alt="Open Chat" className="w-10 h-10 object-contain" />
+        </button>
+      )}
 
       {/* Notification Toast */}
       {generatedCount > 0 && (

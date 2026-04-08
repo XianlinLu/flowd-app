@@ -18,6 +18,7 @@ interface ChatPanelProps {
   onProjectRename?: (newName: string) => void;
   isPetVisible?: boolean;
   onSetPetVisible?: (visible: boolean) => void;
+  onClose?: () => void;
 }
 
 const SMART_BUTTONS = [
@@ -77,7 +78,7 @@ async function* streamChat(messages: Message[], systemPrompt?: string): AsyncGen
   }
 }
 
-export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, onChatComplete, onProjectRename, isPetVisible = false, onSetPetVisible }: ChatPanelProps) {
+export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, onChatComplete, onProjectRename, isPetVisible = false, onSetPetVisible, onClose }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>(() => {
     const stats = boardStore.getStats();
     return [
@@ -965,6 +966,19 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
   return (
     <DragContext.Provider value={{ draggedItem, setDraggedItem }}>
       <div className="h-full flex flex-col relative overflow-hidden bg-[#E6E9EB]">
+        {/* Close Button */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-xl bg-red-500 hover:bg-red-600 text-white shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none"
+            title="关闭聊天框"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+
         {/* Background with noise/texture */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.35] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
 

@@ -12,6 +12,7 @@ export interface Project {
     tableId: string;
     folderToken: string;
   };
+  feishuTableName?: string;
 }
 
 interface UserInfo {
@@ -30,7 +31,7 @@ interface ProjectSidebarProps {
   onRenameProject?: (id: string, newName: string) => void;
   onDeleteProject?: (id: string) => void;
   onPinProject?: (id: string) => void;
-  onBindFeishu?: (id: string, config: any) => void;
+  onBindFeishu?: (id: string, config: any) => Promise<void> | void;
   onTogglePet?: () => void;
   isPetVisible?: boolean;
 }
@@ -61,6 +62,8 @@ export function ProjectSidebar({
   const [newProjectName, setNewProjectName] = useState('');
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   
+  const [isBinding, setIsBinding] = useState(false);
+
   // Ref for clicking outside the menu
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -413,13 +416,21 @@ export function ProjectSidebar({
                 取消
               </button>
               <button
-                onClick={() => {
-                  onBindFeishu?.(bindFeishuModalId, feishuConfigForm);
-                  setBindFeishuModalId(null);
+                onClick={async () => {
+                  setIsBinding(true);
+                  try {
+                    await onBindFeishu?.(bindFeishuModalId, feishuConfigForm);
+                    setBindFeishuModalId(null);
+                  } catch (e) {
+                    console.error('Binding failed', e);
+                  } finally {
+                    setIsBinding(false);
+                  }
                 }}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                disabled={isBinding}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors"
               >
-                保存绑定
+                {isBinding ? '保存中...' : '保存绑定'}
               </button>
             </div>
           </div>

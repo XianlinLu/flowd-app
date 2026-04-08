@@ -391,7 +391,34 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
           </div>
         )}
 
-        {/* Creation Modal */}
+        {/* Delete Confirmation Modal */}
+      {deleteConfirmCardId && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-scale-in">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">确认删除</h3>
+            <p className="text-gray-500 text-sm mb-6">你确定要删除这张卡片吗？此操作无法撤销。</p>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setDeleteConfirmCardId(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                取消
+              </button>
+              <button 
+                onClick={() => {
+                  handleDeleteCard(deleteConfirmCardId);
+                  setDeleteConfirmCardId(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                确认删除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Creation Modal */}
       {creationModalType && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-scale-in">
@@ -1105,6 +1132,203 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                   disabled={isWrapUpLoading}
                 >
                   确认收尾
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Creation Modal */}
+      {creationModalType && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-scale-in">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">{creationFormData.title}</h3>
+              <button onClick={() => setCreationModalType(null)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">
+              {creationModalType === 'meeting' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">参与者</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 张三, 李四"
+                      value={creationFormData.participants}
+                      onChange={e => setCreationFormData({...creationFormData, participants: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">议程</label>
+                    <textarea 
+                      placeholder="会议议程..."
+                      value={creationFormData.agenda}
+                      onChange={e => setCreationFormData({...creationFormData, agenda: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-20 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">纪要</label>
+                    <textarea 
+                      placeholder="会议纪要..."
+                      value={creationFormData.minutes}
+                      onChange={e => setCreationFormData({...creationFormData, minutes: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none"
+                    />
+                  </div>
+                </>
+              )}
+              
+              {creationModalType === 'prd' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">背景</label>
+                    <textarea 
+                      placeholder="需求背景..."
+                      value={creationFormData.background}
+                      onChange={e => setCreationFormData({...creationFormData, background: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-20 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">目标</label>
+                    <textarea 
+                      placeholder="业务目标..."
+                      value={creationFormData.objectives}
+                      onChange={e => setCreationFormData({...creationFormData, objectives: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-20 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">飞书文档链接</label>
+                    <input 
+                      type="text" 
+                      placeholder="https://..."
+                      value={creationFormData.prdLink}
+                      onChange={e => setCreationFormData({...creationFormData, prdLink: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </>
+              )}
+
+              {creationModalType === 'bug' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">严重程度</label>
+                    <select
+                      value={creationFormData.severity}
+                      onChange={e => setCreationFormData({...creationFormData, severity: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="low">低</option>
+                      <option value="medium">中</option>
+                      <option value="high">高</option>
+                      <option value="critical">致命</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">复现步骤</label>
+                    <textarea 
+                      placeholder="1. ...&#10;2. ..."
+                      value={creationFormData.stepsToReproduce}
+                      onChange={e => setCreationFormData({...creationFormData, stepsToReproduce: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">负责人</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 张三"
+                      value={creationFormData.assignee}
+                      onChange={e => setCreationFormData({...creationFormData, assignee: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </>
+              )}
+
+              {creationModalType === 'bookmark' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">链接 URL</label>
+                    <input 
+                      type="text" 
+                      placeholder="https://..."
+                      value={creationFormData.url}
+                      onChange={e => setCreationFormData({...creationFormData, url: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">摘要说明</label>
+                    <textarea 
+                      placeholder="这个链接是关于..."
+                      value={creationFormData.summary}
+                      onChange={e => setCreationFormData({...creationFormData, summary: e.target.value})}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
+              <button 
+                onClick={() => {
+                  alert('已发起同步请求...');
+                  // Simulate sync and close
+                }}
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
+              >
+                <span className="text-base">🔄</span> 同步至飞书
+              </button>
+              
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setCreationModalType(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  取消
+                </button>
+                <button 
+                  onClick={() => {
+                    const metadata: any = { aiGenerated: false };
+                    if (creationModalType === 'meeting') {
+                      metadata.participants = creationFormData.participants.split(',').map((p: string) => p.trim()).filter(Boolean);
+                      metadata.agenda = creationFormData.agenda;
+                      metadata.minutes = creationFormData.minutes;
+                      metadata.actionItems = [];
+                    } else if (creationModalType === 'prd') {
+                      metadata.background = creationFormData.background;
+                      metadata.objectives = creationFormData.objectives;
+                      metadata.acceptanceCriteria = creationFormData.acceptanceCriteria;
+                      metadata.prdLink = creationFormData.prdLink;
+                    } else if (creationModalType === 'bug') {
+                      metadata.severity = creationFormData.severity;
+                      metadata.stepsToReproduce = creationFormData.stepsToReproduce;
+                      metadata.assignee = creationFormData.assignee;
+                    } else if (creationModalType === 'bookmark') {
+                      metadata.url = creationFormData.url;
+                      metadata.summary = creationFormData.summary;
+                    }
+
+                    boardStore.addCard(creationModalType as ContentCategory, {
+                      title: creationFormData.title,
+                      content: '已创建',
+                      metadata
+                    }, 'office_efficiency');
+                    
+                    setCreationModalType(null);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-black rounded-lg transition-colors shadow-sm"
+                >
+                  保存
                 </button>
               </div>
             </div>

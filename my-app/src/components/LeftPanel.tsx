@@ -17,6 +17,7 @@ interface LeftPanelProps {
   feishuTableName?: string;
   isFeishuSynced?: boolean;
   isExpanded?: boolean;
+  onToggleFullScreen?: () => void;
 }
 
 interface ContextMenuState {
@@ -25,7 +26,7 @@ interface ContextMenuState {
   cardId?: string;
 }
 
-export function LeftPanel({ projectName = '新项目', onCardCountChange, onCardUpdate, onCardDelete, onCardChat, onNewProject, feishuTableName, isFeishuSynced, isExpanded = false }: LeftPanelProps) {
+export function LeftPanel({ projectName = '新项目', onCardCountChange, onCardUpdate, onCardDelete, onCardChat, onNewProject, feishuTableName, isFeishuSynced, isExpanded = false, onToggleFullScreen }: LeftPanelProps) {
   const [sections, setSections] = useState<BoardSection[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const selectedCard = selectedCardId ? sections.flatMap(s => s.cards).find(c => c.id === selectedCardId) : null;
@@ -318,6 +319,10 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             <button onClick={handleWrapUpProject} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
               收拢并总结项目
+            </button>
+            <button onClick={() => { onToggleFullScreen?.(); setContextMenu(null); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
+              <span className="text-base w-4 text-center">🖥️</span>
+              全屏聚焦模式
             </button>
             
             <div className="h-px bg-gray-200/50 my-1"></div>
@@ -684,15 +689,22 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       <div className="mb-10 flex flex-col items-start gap-5">
         <h1 className="text-[56px] font-medium text-[#9EA8B0] leading-none tracking-tight">Flowd</h1>
         <div className="flex items-center gap-3">
-          <button
-            onClick={onNewProject}
-            className="w-11 h-11 rounded-full bg-[#EAECEE] shadow-sm flex items-center justify-center hover:bg-[#DFE2E4] transition-colors ml-1"
-            title="新项目"
-          >
-            <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m-7-7h14" />
-            </svg>
-          </button>
+          <div className="relative group ml-1">
+            <button
+              onClick={onNewProject}
+              className="w-11 h-11 rounded-full bg-[#EAECEE] shadow-sm flex items-center justify-center hover:bg-[#DFE2E4] transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m-7-7h14" />
+              </svg>
+            </button>
+            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none">
+              <div className="bg-[#07090C] text-white text-[13px] font-medium py-1.5 px-3 rounded shadow-xl whitespace-nowrap">
+                添加新项目
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 border-solid border-b-[#07090C] border-b-4 border-x-transparent border-x-4 border-t-0"></div>
+              </div>
+            </div>
+          </div>
           
           {isFeishuSynced && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50/50 border border-blue-100 rounded-full text-xs font-medium text-blue-600 ml-2 animate-fade-in">
@@ -827,6 +839,10 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
           <button onClick={handleWrapUpProject} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
             收拢并总结项目
+          </button>
+          <button onClick={() => { onToggleFullScreen?.(); setContextMenu(null); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
+            <span className="text-base w-4 text-center">🖥️</span>
+            全屏聚焦模式
           </button>
           
           <div className="h-px bg-gray-200/50 my-1"></div>

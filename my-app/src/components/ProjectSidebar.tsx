@@ -23,6 +23,7 @@ interface UserInfo {
 
 interface ProjectSidebarProps {
   isOpen: boolean;
+  isHidden?: boolean;
   onToggle: () => void;
   projects: Project[];
   currentProjectId: string;
@@ -48,7 +49,8 @@ export function ProjectSidebar({
   onPinProject,
   onBindFeishu,
   onTogglePet,
-  isPetVisible = false
+  isPetVisible = false,
+  isHidden = false
 }: ProjectSidebarProps) {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -103,8 +105,8 @@ export function ProjectSidebar({
     <>
       {/* Sidebar Panel */}
       <div 
-        className={`flex flex-col h-full bg-[#C7CFD1] border-r border-gray-200/60 transition-all duration-300 ease-in-out shrink-0 ${
-          isOpen ? 'w-[260px]' : 'w-[68px]'
+        className={`flex flex-col h-full bg-[#C7CFD1] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] shrink-0 overflow-hidden ${
+          isHidden ? 'w-0 opacity-0 border-none' : (isOpen ? 'w-[260px] border-r border-gray-200/60' : 'w-[68px] border-r border-gray-200/60')
         }`}
       >
         {isOpen ? (

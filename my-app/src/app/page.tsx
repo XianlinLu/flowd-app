@@ -18,6 +18,7 @@ export default function Home() {
 
   // Sidebar and Project State
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isFullScreenMode, setIsFullScreenMode] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentProjectId, setCurrentProjectId] = useState('1');
@@ -26,6 +27,16 @@ export default function Home() {
   const [bindSuccessMessage, setBindSuccessMessage] = useState<{ tableName: string; timestamp: number } | null>(null);
 
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullScreenMode) {
+        setIsFullScreenMode(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullScreenMode]);
 
   useEffect(() => {
     setMounted(true);
@@ -284,9 +295,17 @@ export default function Home() {
 
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-[#C1C9CC]">
+      {/* Full Screen Mode Hint */}
+      {isFullScreenMode && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-black/60 text-white/90 backdrop-blur-md px-6 py-2 rounded-full text-sm font-medium animate-fade-in flex items-center gap-2 shadow-lg">
+          <span className="opacity-70">⌨️</span> 按 <kbd className="px-2 py-0.5 bg-white/20 rounded text-xs ml-1 mr-1 font-mono">ESC</kbd> 退出全屏模式
+        </div>
+      )}
+
       {/* Project Sidebar (Collapsible) */}
       <ProjectSidebar 
         isOpen={isSidebarOpen}
+        isHidden={isFullScreenMode}
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         projects={displayProjects}
         currentProjectId={currentProjectId}
@@ -313,6 +332,7 @@ export default function Home() {
           onNewProject={handleNewProject}
           feishuTableName={currentProject?.feishuTableName}
           isExpanded={!isChatOpen}
+          onToggleFullScreen={() => setIsFullScreenMode(true)}
         />
       </div>
 

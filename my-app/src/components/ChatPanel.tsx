@@ -161,11 +161,11 @@ export function ChatPanel({
 
   const getPetStatusText = (state: string) => {
     switch(state) {
-      case 'thinking': return '脑暴中 🤔';
+      case 'thinking': return '脑暴中🤔';
       case 'smile': return '治愈中😊';
       case 'happy': return '蹦跶中🥳';
-      case 'see': return '观察中 👀';
-      default: return '摸鱼中 �';
+      case 'see': return '观察中👀';
+      default: return '摸鱼中🐟';
     }
   };
 

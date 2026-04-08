@@ -3,6 +3,12 @@ import { Card, BoardSection, ContentCategory, CardType, CardStatus } from '@/typ
 class BoardStore {
   private sections: BoardSection[] = [
     { 
+      id: 'about',
+      title: '', // Empty title so it doesn't show a big section header if we don't want to, but actually we can render it differently in UI or just let it flow
+      subtitle: '',
+      cards: []
+    },
+    { 
       id: 'onboarding', 
       title: '前期构思与调研', 
       subtitle: '项目初期的想法、探索与决定',
@@ -14,6 +20,12 @@ class BoardStore {
       subtitle: '核心工作区结构与布局',
       cards: [] 
     },
+    {
+      id: 'office_efficiency',
+      title: '辅助办公与效率',
+      subtitle: '日常办公与流程辅助',
+      cards: []
+    }
   ];
   private listeners: Set<() => void> = new Set();
   private currentProjectId: string | null = null;
@@ -60,6 +72,12 @@ class BoardStore {
           // Reset to default empty state
           this.sections = [
             { 
+              id: 'about',
+              title: '',
+              subtitle: '',
+              cards: []
+            },
+            { 
               id: 'onboarding', 
               title: '前期构思与调研', 
               subtitle: '项目初期的想法、探索与决定',
@@ -71,6 +89,12 @@ class BoardStore {
               subtitle: '核心工作区结构与布局',
               cards: [] 
             },
+            {
+              id: 'office_efficiency',
+              title: '辅助办公与效率',
+              subtitle: '日常办公与流程辅助',
+              cards: []
+            }
           ];
         }
       } catch (e) {
@@ -135,6 +159,9 @@ class BoardStore {
   }
 
   private getSectionForCategory(category: ContentCategory): string {
+    if (category === 'meeting' || category === 'prd' || category === 'bug' || category === 'bookmark') {
+      return 'office_efficiency';
+    }
     // Simple logic: onboarding-related cards go to onboarding section
     // This can be enhanced with AI analysis
     return 'onboarding';

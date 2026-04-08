@@ -965,7 +965,7 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
 
   return (
     <DragContext.Provider value={{ draggedItem, setDraggedItem }}>
-      <div className="h-full flex flex-col relative overflow-hidden bg-[#C1C9CC]">
+      <div className="h-full flex flex-col relative overflow-hidden bg-[#E6E9EB]">
         {/* Close Button */}
         {onClose && (
           <button

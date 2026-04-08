@@ -22,7 +22,7 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentProjectId, setCurrentProjectId] = useState('1');
 
-  const [isPetVisible, setIsPetVisible] = useState(false);
+  const [isPetVisible, setIsPetVisible] = useState(true);
   const [bindSuccessMessage, setBindSuccessMessage] = useState<{ tableName: string; timestamp: number } | null>(null);
 
   const [mounted, setMounted] = useState(false);

@@ -137,7 +137,7 @@ export function ChatPanel({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // State for Pet Emotion
-  const [petState, setPetState] = useState<'normal' | 'thinking' | 'smile' | 'happy' | 'sede'>('normal');
+  const [petState, setPetState] = useState<'normal' | 'thinking' | 'smile' | 'happy' | 'see'>('normal');
   const [isPetProfileOpen, setIsPetProfileOpen] = useState(false);
   
   // File upload state
@@ -161,11 +161,11 @@ export function ChatPanel({
 
   const getPetStatusText = (state: string) => {
     switch(state) {
-      case 'thinking': return '正在认真思考 🤔';
-      case 'smile': return '非常高兴 �';
-      case 'happy': return '超级兴奋！✨';
-      case 'sede': return '正在仔细观察 🧐';
-      default: return '闲逛中 🚶‍♂️';
+      case 'thinking': return '脑暴中 🤔';
+      case 'smile': return '治愈中😊';
+      case 'happy': return '蹦跶中🥳';
+      case 'see': return '观察中 👀';
+      default: return '摸鱼中�';
     }
   };
 
@@ -233,7 +233,7 @@ export function ChatPanel({
     
     // Check if the input might be an image/file viewing request (heuristic)
     if (input.toLowerCase().includes('图片') || input.toLowerCase().includes('文章') || input.toLowerCase().includes('看看')) {
-      setPetState('sede');
+      setPetState('see');
     }
     
     try {
@@ -593,7 +593,7 @@ export function ChatPanel({
     
     // Heuristic for viewing files/images
     if (userInput.toLowerCase().includes('图片') || userInput.toLowerCase().includes('文章') || userInput.toLowerCase().includes('看看')) {
-      setPetState('sede');
+      setPetState('see');
     }
 
     // Auto rename project if it's the default name
@@ -1331,7 +1331,7 @@ export function ChatPanel({
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
-              <img src="/normal.gif" alt="Buddy" className="w-24 h-24 object-contain" />
+              <img src={`/${petState}.gif`} alt="Buddy" className="w-24 h-24 object-contain" />
             </div>
             <div className="p-6">
               <div className="flex justify-between items-end mb-4">

@@ -485,7 +485,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
 
   return (
     <div 
-      className="h-full overflow-y-auto p-6 space-y-6 relative"
+      className="h-full overflow-y-auto p-6 space-y-6 relative bg-[#C1C9CC]"
       onContextMenu={(e) => handleContextMenu(e)}
     >
       {/* Logo and New Project Button */}

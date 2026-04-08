@@ -270,7 +270,7 @@ export default function Home() {
             : 'w-0 p-0 opacity-0 scale-[0.05] translate-x-12 translate-y-12'
         }`}
       >
-        <div className="h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-2xl border border-white/40 min-w-[500px]">
+        <div className="h-full w-full bg-[#C1C9CC] rounded-3xl overflow-hidden shadow-2xl border border-white/40 min-w-[500px]">
           <ChatPanel 
           key={`chat-${currentProjectId}`}
           projectName={currentProject?.name || '新项目'}

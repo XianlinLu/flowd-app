@@ -77,7 +77,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-[#D2D6D8] p-12 text-[#6C767B]">
+    <div className="w-full h-full overflow-y-auto bg-[#C1C9CC] p-12 text-[#6C767B]">
       <h1 className="text-5xl font-medium mb-12">Flowd</h1>
       
       {/* Today Section */}

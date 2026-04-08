@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface Project {
   id: string;
@@ -289,8 +290,14 @@ export function ProjectSidebar({
             </button>
 
             {/* User Dropdown Menu */}
-            {isUserMenuOpen && (
-              <div className="absolute bottom-[85px] left-4 w-48 bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 py-1 z-50 animate-fade-in origin-bottom-left">
+            {isUserMenuOpen && typeof window !== 'undefined' && createPortal(
+              <div 
+                className="absolute w-48 bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 py-1 z-[9999] animate-fade-in origin-bottom-left"
+                style={{
+                  bottom: '85px',
+                  left: isOpen ? '16px' : '8px'
+                }}
+              >
                 <a 
                   href="https://flowd-thinking-os.com/" 
                   target="_blank" 
@@ -330,7 +337,8 @@ export function ProjectSidebar({
                   </svg>
                   退出登录
                 </button>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         )}

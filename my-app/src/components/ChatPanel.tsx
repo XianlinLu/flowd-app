@@ -165,7 +165,7 @@ export function ChatPanel({
       case 'smile': return '治愈中😊';
       case 'happy': return '蹦跶中🥳';
       case 'see': return '观察中 👀';
-      default: return '摸鱼中�';
+      default: return '摸鱼中 �';
     }
   };
 

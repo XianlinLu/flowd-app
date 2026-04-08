@@ -247,7 +247,7 @@ export default function Home() {
       />
 
       {/* Left Side - Board Panel */}
-      <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-500 ease-in-out ${isChatOpen ? 'w-[380px]' : 'flex-1 w-full'}`}>
+      <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isChatOpen ? 'w-[380px]' : 'flex-1 w-full'}`}>
         <LeftPanel 
           key={`left-${currentProjectId}`}
           projectName={currentProject?.name || '新项目'}
@@ -263,8 +263,14 @@ export default function Home() {
       </div>
 
       {/* Right Side - Chat Panel (占大部分) */}
-      <div className={`bg-[#C1C9CC] transition-all duration-500 ease-in-out overflow-hidden ${isChatOpen ? 'flex-1 p-4 pl-0 opacity-100' : 'w-0 p-0 opacity-0'}`}>
-        <div className="h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-sm border border-white/40">
+      <div 
+        className={`transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-[calc(100%-2rem)_calc(100%-2rem)] flex flex-col ${
+          isChatOpen 
+            ? 'flex-1 p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 w-auto' 
+            : 'w-0 p-0 opacity-0 scale-[0.05] translate-x-12 translate-y-12'
+        }`}
+      >
+        <div className="h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-2xl border border-white/40 min-w-[500px]">
           <ChatPanel 
           key={`chat-${currentProjectId}`}
           projectName={currentProject?.name || '新项目'}
@@ -283,7 +289,7 @@ export default function Home() {
       {!isChatOpen && (
         <button
           onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 z-50 overflow-hidden border border-gray-200"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 z-50 overflow-hidden border border-gray-200 animate-scale-in"
         >
           <img src="/logo.png" alt="Open Chat" className="w-10 h-10 object-contain" />
         </button>

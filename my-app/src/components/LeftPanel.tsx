@@ -742,48 +742,64 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
         </div>
       </div>
 
-
-
-      {/* Sections */}
-      {sections.map((section) => (
-        <div key={section.id} className="animate-slide-in bg-[#D5DCDE] rounded-3xl p-5 shadow-sm border border-white/30">
-          {/* Section Header */}
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-800">
-              {section.title === 'Onboarding State' ? '引导状态' : 
-               section.title === 'Workspace Model' ? '工作区模型' : section.title}
-            </h2>
-            {section.subtitle && (
-              <p className="text-xs text-gray-400 mt-0.5">
-                {section.subtitle === 'User onboarding experience decisions' ? '用户引导体验决策' :
-                 section.subtitle === 'Core workspace structure and layout' ? '核心工作区结构与布局' : section.subtitle}
-              </p>
-            )}
-          </div>
-
-          {/* Cards */}
-          <div className="space-y-3">
-            {section.cards.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-xs border-2 border-dashed border-gray-200 rounded-xl">
-                <p>暂无卡片</p>
-                <p className="mt-1">在右侧输入想法，AI 会自动归类</p>
-              </div>
-            ) : (
-              section.cards.map((card) => (
-                <DraggableCard
-                  key={card.id}
-                  card={card}
-                  onUpdate={handleUpdateCard}
-                  onDelete={handleDeleteCard}
-                  onChat={handleChatCard}
-                  onClick={(card) => setSelectedCardId(card.id)}
-                  onContextMenu={handleContextMenu}
-                />
-              ))
-            )}
-          </div>
+      {/* About Section Standalone Cards */}
+      {sections.flatMap(s => s.cards).filter(card => card.metadata?.isAboutFlowd).map((card) => (
+        <div key={card.id} className="animate-slide-in mb-6">
+          <DraggableCard
+            card={card}
+            onUpdate={handleUpdateCard}
+            onDelete={handleDeleteCard}
+            onChat={handleChatCard}
+            onClick={(card) => setSelectedCardId(card.id)}
+            onContextMenu={handleContextMenu}
+          />
         </div>
       ))}
+
+      {/* Sections */}
+      {sections.filter(s => s.id !== 'about').map((section) => {
+        const displayCards = section.cards.filter(card => !card.metadata?.isAboutFlowd);
+        
+        return (
+          <div key={section.id} className="animate-slide-in bg-[#D5DCDE] rounded-3xl p-5 shadow-sm border border-white/30">
+            {/* Section Header */}
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {section.title === 'Onboarding State' ? '引导状态' : 
+                 section.title === 'Workspace Model' ? '工作区模型' : section.title}
+              </h2>
+              {section.subtitle && (
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {section.subtitle === 'User onboarding experience decisions' ? '用户引导体验决策' :
+                   section.subtitle === 'Core workspace structure and layout' ? '核心工作区结构与布局' : section.subtitle}
+                </p>
+              )}
+            </div>
+
+            {/* Cards */}
+            <div className="space-y-3">
+              {displayCards.length === 0 ? (
+                <div className="text-center py-8 text-gray-400 text-xs border-2 border-dashed border-gray-200 rounded-xl">
+                  <p>暂无卡片</p>
+                  <p className="mt-1">在右侧输入想法，AI 会自动归类</p>
+                </div>
+              ) : (
+                displayCards.map((card) => (
+                  <DraggableCard
+                    key={card.id}
+                    card={card}
+                    onUpdate={handleUpdateCard}
+                    onDelete={handleDeleteCard}
+                    onChat={handleChatCard}
+                    onClick={(card) => setSelectedCardId(card.id)}
+                    onContextMenu={handleContextMenu}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        );
+      })}
 
       {/* Empty State Hint */}
       {sections.every(s => s.cards.length === 0) && (

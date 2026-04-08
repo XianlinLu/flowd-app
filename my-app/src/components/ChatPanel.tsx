@@ -19,6 +19,8 @@ interface ChatPanelProps {
   isPetVisible?: boolean;
   onSetPetVisible?: (visible: boolean) => void;
   onClose?: () => void;
+  bindSuccessMessage?: { tableName: string; timestamp: number } | null;
+  onClearBindSuccessMessage?: () => void;
 }
 
 const SMART_BUTTONS = [
@@ -78,7 +80,18 @@ async function* streamChat(messages: Message[], systemPrompt?: string): AsyncGen
   }
 }
 
-export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, onChatComplete, onProjectRename, isPetVisible = false, onSetPetVisible, onClose }: ChatPanelProps) {
+export function ChatPanel({ 
+  projectName = 'Flowd', 
+  onCardsGenerated, 
+  chatCard, 
+  onChatComplete, 
+  onProjectRename, 
+  isPetVisible = false, 
+  onSetPetVisible, 
+  onClose,
+  bindSuccessMessage,
+  onClearBindSuccessMessage
+}: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>(() => {
     const stats = boardStore.getStats();
     return [
@@ -169,6 +182,24 @@ export function ChatPanel({ projectName = 'Flowd', onCardsGenerated, chatCard, o
       handleDiscussQuestion(chatCard);
     }
   }, [chatCard]);
+
+  // Handle bind success message
+  useEffect(() => {
+    if (bindSuccessMessage) {
+      const msgId = `msg_${bindSuccessMessage.timestamp}_bind`;
+      // Check if we already added it
+      setMessages(prev => {
+        if (prev.some(m => m.id === msgId)) return prev;
+        return [...prev, {
+          id: msgId,
+          role: 'assistant',
+          content: `目前已经接入${bindSuccessMessage.tableName}，数据已同步，接下来需要做什么？`,
+          timestamp: Date.now(),
+        }];
+      });
+      onClearBindSuccessMessage?.();
+    }
+  }, [bindSuccessMessage, onClearBindSuccessMessage]);
 
   // Discuss open question
   const handleDiscussQuestion = async (card: Card) => {

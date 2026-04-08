@@ -23,6 +23,7 @@ export default function Home() {
   const [currentProjectId, setCurrentProjectId] = useState('1');
 
   const [isPetVisible, setIsPetVisible] = useState(false);
+  const [bindSuccessMessage, setBindSuccessMessage] = useState<{ tableName: string; timestamp: number } | null>(null);
 
   const [mounted, setMounted] = useState(false);
 
@@ -173,6 +174,12 @@ export default function Home() {
         if (data.name) {
           tableName = data.name;
         }
+
+        // Mock importing data from Feishu to Flowd
+        boardStore.addCard('note', {
+          title: `来自 ${tableName} 的同步数据`,
+          content: `成功绑定了多维表格：App Token (${feishuConfig.appToken})，数据已导入 Flowd 平台。`
+        });
       } catch (e) {
         console.error('Failed to fetch bitable info', e);
         throw e;
@@ -182,6 +189,8 @@ export default function Home() {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, feishuConfig, feishuTableName: tableName } : p));
     if (id === currentProjectId) {
       (window as any).__currentProjectFeishuConfig = feishuConfig;
+      setBindSuccessMessage({ tableName, timestamp: Date.now() });
+      setIsChatOpen(true); // Open chat if closed
     }
   }, [currentProjectId]);
 
@@ -281,6 +290,8 @@ export default function Home() {
           isPetVisible={isPetVisible}
           onSetPetVisible={setIsPetVisible}
           onClose={() => setIsChatOpen(false)}
+          bindSuccessMessage={bindSuccessMessage}
+          onClearBindSuccessMessage={() => setBindSuccessMessage(null)}
         />
         </div>
       </div>

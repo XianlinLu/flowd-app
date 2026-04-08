@@ -1,5 +1,6 @@
 import { Card } from '@/types/board';
 import { FlowdCard } from './FlowdCard';
+import { useState } from 'react';
 
 interface ExpandedBoardProps {
   cards: Card[];
@@ -10,6 +11,8 @@ interface ExpandedBoardProps {
 }
 
 export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, onCardClick }: ExpandedBoardProps) {
+  const [activeGroup, setActiveGroup] = useState<{ title: string, cards: Card[] } | null>(null);
+
   const todayStart = new Date().setHours(0, 0, 0, 0);
 
   // Separate Today and Past, and sort them by createdAt descending (newest first)
@@ -36,7 +39,10 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
     if (cardsGroup.length === 0) return null;
     
     return (
-      <div className={`relative flex-1 min-w-[300px] h-[220px] rounded-3xl p-6 overflow-hidden ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}>
+      <div 
+        className={`relative flex-1 min-w-[300px] h-[220px] rounded-3xl p-6 overflow-hidden ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}
+        onClick={() => setActiveGroup({ title, cards: cardsGroup })}
+      >
         <div className="absolute top-6 left-6 z-20">
           <h3 className="text-xl font-semibold text-gray-500/80 group-hover:text-gray-700 transition-colors">{title}</h3>
           <p className="text-sm text-gray-400 mt-1">{subtitle}</p>
@@ -55,10 +61,6 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
                 zIndex: 10 - idx,
                 transform: `translate(${idx * 15}px, ${idx * 10}px) rotate(${idx * 3}deg) scale(${1 - idx * 0.05})`,
                 opacity: 1 - idx * 0.1
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onCardClick?.(card);
               }}
             >
               <div className="w-full h-full pointer-events-none overflow-hidden rounded-[20px] [&>div]:h-full [&>div]:w-full [&>div]:m-0">
@@ -133,6 +135,48 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
           </div>
         )}
       </div>
+
+      {/* Group Modal */}
+      {activeGroup && (
+        <div 
+          className="fixed inset-0 z-[120] flex items-center justify-center p-8 bg-[#879296]/90 backdrop-blur-md animate-fade-in"
+          onClick={() => setActiveGroup(null)}
+        >
+          <div 
+            className="flex flex-wrap gap-6 items-center justify-center max-w-[90vw] max-h-[90vh] overflow-y-auto p-8 no-scrollbar"
+            onClick={e => e.stopPropagation()}
+          >
+            {activeGroup.cards.map((card, idx) => (
+              <div 
+                key={card.id} 
+                className="w-[320px] h-[220px] shrink-0 animate-slide-up hover:scale-105 transition-transform cursor-pointer shadow-xl rounded-[20px]"
+                style={{ animationDelay: `${idx * 50}ms` }}
+                onClick={() => {
+                  setActiveGroup(null);
+                  onCardClick?.(card);
+                }}
+              >
+                <div className="w-full h-full overflow-hidden rounded-[20px] [&>div]:h-full [&>div]:w-full [&>div]:m-0">
+                  <FlowdCard 
+                    card={card}
+                    isModal={false}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Close button for modal */}
+          <button 
+            className="absolute top-8 right-8 text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full p-2 transition-colors"
+            onClick={() => setActiveGroup(null)}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

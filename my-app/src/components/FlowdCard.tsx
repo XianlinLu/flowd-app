@@ -81,17 +81,19 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
           <span className="text-[10px] tracking-widest uppercase" style={{ color: config.textColor, opacity: 0.6 }}>
             {CATEGORY_LABELS[card.category]}
           </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete?.(card.id);
-            }}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-black/10 rounded"
-          >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: config.textColor }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          {!isModal && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.(card.id);
+              }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-black/10 rounded"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: config.textColor }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* Title */}

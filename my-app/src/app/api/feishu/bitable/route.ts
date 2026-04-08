@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const FEISHU_APP_ID = process.env.FEISHU_APP_ID || 'cli_a123456789';
-const FEISHU_APP_SECRET = process.env.FEISHU_APP_SECRET || 'your_app_secret';
+const FEISHU_APP_ID = process.env.FEISHU_APP_ID || 'cli_a94825f251f85bb5';
+const FEISHU_APP_SECRET = process.env.FEISHU_APP_SECRET || 'ELudaGhCdcA6DsLqipylfeJ5NbVrbArg';
 
 export async function GET(request: Request) {
   try {

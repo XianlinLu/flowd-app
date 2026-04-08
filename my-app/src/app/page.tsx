@@ -29,10 +29,60 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    setProjects([
-      { id: '1', name: '新项目', sessions: 0, artifacts: 0, createdAt: Date.now() },
-    ]);
+    if (typeof window !== 'undefined') {
+      try {
+        const storedProjects = localStorage.getItem('flowd_projects');
+        const storedCurrentProjectId = localStorage.getItem('flowd_current_project_id');
+        
+        if (storedProjects) {
+          const parsedProjects = JSON.parse(storedProjects);
+          setProjects(parsedProjects);
+          
+          if (storedCurrentProjectId && parsedProjects.some((p: Project) => p.id === storedCurrentProjectId)) {
+            setCurrentProjectId(storedCurrentProjectId);
+            boardStore.setProjectId(storedCurrentProjectId);
+          } else if (parsedProjects.length > 0) {
+            setCurrentProjectId(parsedProjects[0].id);
+            boardStore.setProjectId(parsedProjects[0].id);
+          }
+        } else {
+          setProjects([
+            { id: '1', name: '新项目', sessions: 0, artifacts: 0, createdAt: Date.now() },
+          ]);
+          boardStore.setProjectId('1');
+        }
+      } catch (e) {
+        console.error('Failed to load projects from localStorage', e);
+        setProjects([
+          { id: '1', name: '新项目', sessions: 0, artifacts: 0, createdAt: Date.now() },
+        ]);
+        boardStore.setProjectId('1');
+      }
+    }
   }, []);
+
+  // Save projects to localStorage whenever they change
+  useEffect(() => {
+    if (mounted && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('flowd_projects', JSON.stringify(projects));
+      } catch (e) {
+        console.error('Failed to save projects to localStorage', e);
+      }
+    }
+  }, [projects, mounted]);
+
+  // Save current project id to localStorage whenever it changes
+  useEffect(() => {
+    if (mounted && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('flowd_current_project_id', currentProjectId);
+        boardStore.setProjectId(currentProjectId);
+      } catch (e) {
+        console.error('Failed to save current project id to localStorage', e);
+      }
+    }
+  }, [currentProjectId, mounted]);
 
   // Sync artifacts count dynamically based on the current board store stats
   useEffect(() => {
@@ -130,9 +180,6 @@ export default function Home() {
   }, []);
 
   const handleNewProject = useCallback(() => {
-    // Clear global board state
-    boardStore.clear();
-    
     // Create new project and prepend it to the list
     const newId = Date.now().toString();
     setProjects(prev => [
@@ -148,9 +195,7 @@ export default function Home() {
   }, []);
 
   const handleSelectProject = useCallback((id: string) => {
-    // In a real app, this would fetch and hydrate the project's data into boardStore.
-    // For now, we simulate switching projects by clearing the board and remounting.
-    boardStore.clear();
+    // boardStore.setProjectId handles hydration
     setCurrentProjectId(id);
   }, []);
 
@@ -282,6 +327,7 @@ export default function Home() {
         <div className="h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-2xl border border-white/40 min-w-[500px]">
           <ChatPanel 
           key={`chat-${currentProjectId}`}
+          projectId={currentProjectId}
           projectName={currentProject?.name || '新项目'}
           onCardsGenerated={handleCardsGenerated}
           chatCard={chatCard}

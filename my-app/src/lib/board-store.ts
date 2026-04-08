@@ -16,6 +16,68 @@ class BoardStore {
     },
   ];
   private listeners: Set<() => void> = new Set();
+  private currentProjectId: string | null = null;
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      this.loadFromLocalStorage();
+    }
+  }
+
+  setProjectId(projectId: string) {
+    if (this.currentProjectId !== projectId) {
+      // Save current project before switching
+      if (this.currentProjectId) {
+        this.saveToLocalStorage();
+      }
+      this.currentProjectId = projectId;
+      this.loadFromLocalStorage();
+      this.notify();
+    }
+  }
+
+  private getStorageKey() {
+    return this.currentProjectId ? `flowd_board_${this.currentProjectId}` : 'flowd_board_default';
+  }
+
+  private saveToLocalStorage() {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(this.getStorageKey(), JSON.stringify(this.sections));
+      } catch (e) {
+        console.error('Failed to save board to localStorage', e);
+      }
+    }
+  }
+
+  private loadFromLocalStorage() {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(this.getStorageKey());
+        if (stored) {
+          this.sections = JSON.parse(stored);
+        } else {
+          // Reset to default empty state
+          this.sections = [
+            { 
+              id: 'onboarding', 
+              title: '前期构思与调研', 
+              subtitle: '项目初期的想法、探索与决定',
+              cards: [] 
+            },
+            { 
+              id: 'workspace', 
+              title: '落地执行与设计', 
+              subtitle: '核心工作区结构与布局',
+              cards: [] 
+            },
+          ];
+        }
+      } catch (e) {
+        console.error('Failed to load board from localStorage', e);
+      }
+    }
+  }
 
   subscribe(listener: () => void) {
     this.listeners.add(listener);
@@ -23,6 +85,7 @@ class BoardStore {
   }
 
   private notify() {
+    this.saveToLocalStorage();
     this.listeners.forEach(listener => listener());
   }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Message } from '@/types/chat';
 import { AISuggestion, ContentCategory, Card } from '@/types/board';
 import { boardStore } from '@/lib/board-store';
@@ -1320,103 +1321,68 @@ export function ChatPanel({
       </div>
 
       {/* Pet Profile Modal */}
-      {isPetProfileOpen && (
-        <div className="fixed inset-0 z-[150] flex flex-col bg-white animate-fade-in">
-          {/* Full Screen Close Button */}
-          <div className="absolute right-6 top-6 z-10">
-            <button 
-              onClick={() => setIsPetProfileOpen(false)}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </div>
-
-          {/* Top Half - Pet Display Area */}
-          <div className="flex-1 bg-[#E6E9EB] flex flex-col items-center justify-center relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.35] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-            
-            <div className="relative z-10 animate-pet-bounce">
-              <img src={`/${petState === 'normal' ? 'smile' : petState}.gif`} alt="Buddy" className="w-64 h-64 object-contain filter drop-shadow-2xl" />
+      {isPetProfileOpen && typeof window !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/20 backdrop-blur-md animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-in">
+            <div className="bg-[#E6E9EB] p-8 flex justify-center relative">
+              <button 
+                onClick={() => setIsPetProfileOpen(false)}
+                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+              <img src="/normal.gif" alt="Buddy" className="w-24 h-24 object-contain" />
             </div>
-            
-            <div className="mt-12 text-center relative z-10 animate-fade-in" style={{ animationDelay: '200ms' }}>
-              <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/80 backdrop-blur-md rounded-full shadow-sm text-blue-600 font-medium text-lg border border-white/40">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
-                {getPetStatusText(petState)}
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Half - Info Area */}
-          <div className="flex-1 bg-white p-12 lg:p-20 flex justify-center">
-            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-16 animate-slide-up">
-              {/* Left Column: Basic Info */}
-              <div className="space-y-8">
+            <div className="p-6">
+              <div className="flex justify-between items-end mb-4">
                 <div>
-                  <h2 className="text-5xl font-black text-gray-900 tracking-tight mb-2">Buddy</h2>
-                  <p className="text-xl text-gray-500 font-medium">Flowd 专属电子宠物</p>
+                  <h3 className="text-2xl font-bold text-gray-900">Buddy</h3>
+                  <p className="text-sm text-gray-500">Flowd 专属电子宠物</p>
                 </div>
-                
-                <div className="space-y-6 pt-8 border-t border-gray-100">
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-lg text-gray-500">破壳日</span>
-                    <span className="text-xl text-gray-900 font-bold font-mono">2026-04-06</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-lg text-gray-500">爱好</span>
-                    <span className="text-xl text-gray-900 font-bold">看你思考、吃数据零食</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-lg text-gray-500">性格</span>
-                    <span className="text-xl text-gray-900 font-bold">好奇、热情、黏人</span>
+                <div className="text-right">
+                  <div className="text-xs text-gray-400 mb-1">当前状态</div>
+                  <div className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                    {getPetStatusText(petState)}
                   </div>
                 </div>
               </div>
+              
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">生日</span>
+                  <span className="text-gray-900 font-medium">2026-04-06</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">爱好</span>
+                  <span className="text-gray-900 font-medium">看你思考、吃数据零食</span>
+                </div>
+              </div>
 
-              {/* Right Column: Interaction Guide */}
-              <div className="bg-gray-50/80 rounded-[32px] p-10 border border-gray-100/50">
-                <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-8 flex items-center gap-3">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  互动指令指南
-                </h3>
-                <div className="space-y-6">
-                  <div className="flex items-start gap-5 group">
-                    <code className="bg-white shadow-sm border border-gray-200 px-3 py-1.5 rounded-lg text-sm font-mono text-gray-800 transition-colors group-hover:border-blue-300 group-hover:text-blue-600">/pet</code>
-                    <div className="pt-1.5">
-                      <p className="text-base text-gray-700 font-medium">召唤陪伴</p>
-                      <p className="text-sm text-gray-500 mt-1">让 Buddy 出来陪你一起思考</p>
-                    </div>
+              <div className="border-t border-gray-100 pt-4">
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">互动指令说明</h4>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-3">
+                    <code className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">/pet</code>
+                    <span>召唤 Buddy 出来陪伴</span>
                   </div>
-                  <div className="flex items-start gap-5 group">
-                    <code className="bg-white shadow-sm border border-gray-200 px-3 py-1.5 rounded-lg text-sm font-mono text-gray-800 transition-colors group-hover:border-blue-300 group-hover:text-blue-600">/pet sleep</code>
-                    <div className="pt-1.5">
-                      <p className="text-base text-gray-700 font-medium">回去休息</p>
-                      <p className="text-sm text-gray-500 mt-1">如果觉得挡视线，可以让它去睡觉</p>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <code className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">/pet sleep</code>
+                    <span>让 Buddy 回去休息</span>
                   </div>
-                  <div className="flex items-start gap-5 group">
-                    <code className="bg-white shadow-sm border border-gray-200 px-3 py-1.5 rounded-lg text-sm font-mono text-gray-800 transition-colors group-hover:border-blue-300 group-hover:text-blue-600">/pet feed</code>
-                    <div className="pt-1.5">
-                      <p className="text-base text-gray-700 font-medium">投喂零食 🍖</p>
-                      <p className="text-sm text-gray-500 mt-1">给它喂点数据，它会非常开心</p>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <code className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">/pet feed</code>
+                    <span>给它喂点吃的 🍖</span>
                   </div>
-                  <div className="flex items-start gap-5 group">
-                    <code className="bg-white shadow-sm border border-gray-200 px-3 py-1.5 rounded-lg text-sm font-mono text-gray-800 transition-colors group-hover:border-blue-300 group-hover:text-blue-600">/pet hide</code>
-                    <div className="pt-1.5">
-                      <p className="text-base text-gray-700 font-medium">捉迷藏 👻</p>
-                      <p className="text-sm text-gray-500 mt-1">和 Buddy 玩个小游戏</p>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <code className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">/pet hide</code>
+                    <span>和 Buddy 捉迷藏 👻</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </DragContext.Provider>
   );

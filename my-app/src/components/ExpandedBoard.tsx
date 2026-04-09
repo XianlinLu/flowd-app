@@ -40,7 +40,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
     
     return (
       <div 
-        className={`relative flex-1 min-w-[300px] h-[220px] rounded-3xl p-6 overflow-hidden ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}
+        className={`relative w-full h-[220px] rounded-3xl p-6 overflow-hidden ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}
         onClick={() => setActiveGroup({ title, cards: cardsGroup })}
       >
         <div className="absolute top-6 left-6 z-20">
@@ -107,7 +107,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
         {pastCards.length === 0 ? (
           <div className="text-sm opacity-60">过去还没有产生卡片。</div>
         ) : (
-          <div className="flex flex-wrap gap-6">
+          <div className="grid grid-cols-2 gap-6 w-full">
             <CardStack 
               title="已做决定" 
               subtitle="3天前" 

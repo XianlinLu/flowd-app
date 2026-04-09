@@ -17,20 +17,24 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
 
   // Separate Today and Past, and sort them by createdAt descending (newest first)
   const sortedCards = [...cards].sort((a, b) => b.createdAt - a.createdAt);
-  const todayCards = sortedCards.filter(c => c.createdAt >= todayStart);
-  const pastCards = sortedCards.filter(c => c.createdAt < todayStart);
+  
+  // Extract About Flowd card
+  const aboutCard = sortedCards.find(c => c.metadata?.isAboutFlowd);
+  
+  // Filter out about card for general grouping
+  const regularCards = sortedCards.filter(c => !c.metadata?.isAboutFlowd);
+  
+  const todayCards = regularCards.filter(c => c.createdAt >= todayStart);
+  const pastCards = regularCards.filter(c => c.createdAt < todayStart);
 
-  // Group past cards (and any other cards if needed, maybe just past cards based on the prompt's grouping rules)
-  // Wait, the prompt says "今天产出了哪些卡片；过去产生了哪些卡片。并且这些卡片都做了归类，比如：所有做过决定的卡片会归纳到“已做决定”的区域..."
-  // This implies the grouping applies to Past cards (Last time), and maybe Today cards are just listed?
-  // Let's assume Today is just a list of cards, and Past is grouped into stacks.
-  
-  // Actually, to make it look good even if all cards are created today, we can group ALL completed/decided cards into the "Past/Grouped" section, and active ones in "Today"?
-  // Let's stick to the time-based separation if possible, but for demonstration, let's group all cards that match the criteria into the groups, and the rest in "Today".
-  // The prompt says: "今天产出了哪些卡片；过去产生了哪些卡片。并且这些卡片都做了归类..." 
-  
+  // Group today's cards
+  const todayTodoCards = todayCards.filter(c => c.category === 'todo');
+  const todayNoteCards = todayCards.filter(c => c.category === 'note' || c.category === 'decided' || c.category === 'open_question');
+  const todayOfficeCards = todayCards.filter(c => c.category === 'meeting' || c.category === 'prd' || c.category === 'bug' || c.category === 'bookmark');
+
+  // Group past cards
   const decidedCards = pastCards.filter(c => c.category === 'decided');
-  const completedTodoCards = pastCards.filter(c => c.category === 'todo' && c.metadata?.items?.length && c.metadata?.checkedItems?.every(v => v === true));
+  const completedTodoCards = pastCards.filter(c => c.category === 'todo' && c.metadata?.items?.length && c.metadata?.checkedItems?.every((v: boolean) => v === true));
   const answeredQuestionCards = pastCards.filter(c => c.category === 'open_question' && !!c.answer);
   const otherPastCards = pastCards.filter(c => !decidedCards.includes(c) && !completedTodoCards.includes(c) && !answeredQuestionCards.includes(c));
 
@@ -83,22 +87,44 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
       {/* Today Section */}
       <div className="mb-16">
         <h2 className="text-2xl font-medium mb-6 text-[#7E898E]">今天</h2>
-        <div className="flex flex-wrap gap-6">
-          {todayCards.length === 0 ? (
-            <div className="text-sm opacity-60">今天还没有产生卡片。</div>
-          ) : (
-            todayCards.map(card => (
-              <div key={card.id} className="w-[300px] h-[200px] shrink-0 transition-transform hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md rounded-[20px]" onClick={() => onCardClick?.(card)}>
+        {todayCards.length === 0 && !aboutCard ? (
+          <div className="text-sm opacity-60">今天还没有产生卡片。</div>
+        ) : (
+          <div className="grid grid-cols-2 gap-6 w-full">
+            {/* About Flowd Standalone - Always renders if exists, usually counts as 'today' for visibility */}
+            {aboutCard && (
+              <div 
+                className="w-full h-[220px] transition-transform hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md rounded-[20px]" 
+                onClick={() => onCardClick?.(aboutCard)}
+              >
                 <div className="w-full h-full overflow-hidden rounded-[20px] [&>div]:h-full [&>div]:w-full [&>div]:m-0">
                   <FlowdCard 
-                    card={card}
+                    card={aboutCard}
                     isModal={false}
                   />
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            )}
+            <CardStack 
+              title="待办事项" 
+              subtitle="今天" 
+              cardsGroup={todayTodoCards} 
+              colorClass="bg-[#E2E6E8] border border-white/40 shadow-sm"
+            />
+            <CardStack 
+              title="想法笔记" 
+              subtitle="今天" 
+              cardsGroup={todayNoteCards} 
+              colorClass="bg-[#E2E6E8] border border-white/40 shadow-sm"
+            />
+            <CardStack 
+              title="辅助办公" 
+              subtitle="今天" 
+              cardsGroup={todayOfficeCards} 
+              colorClass="bg-[#E2E6E8] border border-white/40 shadow-sm"
+            />
+          </div>
+        )}
       </div>
 
       {/* Last Time Section */}

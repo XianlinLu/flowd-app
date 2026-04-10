@@ -95,7 +95,7 @@ export function ProjectSidebar({
       }
       // Assuming you might click outside the user menu, close it
       const target = event.target as HTMLElement;
-      if (!target.closest('.user-menu-container')) {
+      if (!target.closest('.user-menu-container') && !target.closest('.user-dropdown-menu')) {
         setIsUserMenuOpen(false);
       }
     };
@@ -292,7 +292,7 @@ export function ProjectSidebar({
             {/* User Dropdown Menu */}
             {isUserMenuOpen && typeof window !== 'undefined' && createPortal(
               <div 
-                className="absolute w-48 bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 py-1 z-[9999] animate-fade-in origin-bottom-left"
+                className="absolute w-48 bg-white rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 py-1 z-[9999] animate-fade-in origin-bottom-left user-dropdown-menu"
                 style={{
                   bottom: '85px',
                   left: isOpen ? '16px' : '8px'

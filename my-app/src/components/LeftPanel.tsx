@@ -355,12 +355,20 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                         });
                         alert(`同步成功！已将卡片同步至飞书。\n文档链接: ${data.url}`);
                       } else {
-                        boardStore.updateCard(card.id, { status: 'sync_failed' });
-                        alert(`同步失败: ${data.error || '未知错误'}`);
+                        const errorMsg = data.details || data.error || '未知错误';
+                        boardStore.updateCard(card.id, { 
+                          status: 'sync_failed',
+                          metadata: { ...card.metadata, syncError: errorMsg }
+                        });
+                        alert(`同步失败: ${errorMsg}`);
                       }
-                    } catch (err) {
-                      boardStore.updateCard(card.id, { status: 'sync_failed' });
-                      alert('同步请求失败，请检查网络或控制台日志。');
+                    } catch (err: any) {
+                      const errorMsg = err.message || '网络或服务器错误';
+                      boardStore.updateCard(card.id, { 
+                        status: 'sync_failed',
+                        metadata: { ...card.metadata, syncError: errorMsg }
+                      });
+                      alert(`同步请求失败: ${errorMsg}`);
                     }
                   }
                 }
@@ -968,12 +976,20 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                       });
                       alert(`同步成功！已将卡片同步至飞书。\n文档链接: ${data.url}`);
                     } else {
-                      boardStore.updateCard(card.id, { status: 'sync_failed' });
-                      alert(`同步失败: ${data.error || '未知错误'}`);
+                      const errorMsg = data.details || data.error || '未知错误';
+                      boardStore.updateCard(card.id, { 
+                        status: 'sync_failed',
+                        metadata: { ...card.metadata, syncError: errorMsg }
+                      });
+                      alert(`同步失败: ${errorMsg}`);
                     }
-                  } catch (err) {
-                    boardStore.updateCard(card.id, { status: 'sync_failed' });
-                    alert('同步请求失败，请检查网络或控制台日志。');
+                  } catch (err: any) {
+                    const errorMsg = err.message || '网络或服务器错误';
+                    boardStore.updateCard(card.id, { 
+                      status: 'sync_failed',
+                      metadata: { ...card.metadata, syncError: errorMsg }
+                    });
+                    alert(`同步请求失败: ${errorMsg}`);
                   }
                 }
               }

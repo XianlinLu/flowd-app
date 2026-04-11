@@ -55,10 +55,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Failed to sync card to Feishu:', error);
+    // 提取命令执行的错误信息（如果有）
+    const errorMessage = error.stderr || error.message || '未知错误';
     return NextResponse.json(
       { 
-        error: 'Failed to sync with Feishu',
-        details: error.message 
+        error: '同步到飞书失败',
+        details: errorMessage 
       },
       { status: 500 }
     );

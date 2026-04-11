@@ -47,6 +47,8 @@ export interface Card {
     };
     // 飞书同步文档链接
     feishuDocUrl?: string;
+    // 飞书同步错误信息
+    syncError?: string;
   };
 }
 

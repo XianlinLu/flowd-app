@@ -387,10 +387,10 @@ export default function Home() {
 
       {/* Right Side - Chat Panel (占大部分) */}
       <div 
-        className={`transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-[calc(100%-2rem)_calc(100%-2rem)] flex flex-col ${
+        className={`transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-[calc(100%-2rem)_calc(100%-2rem)] flex flex-col min-w-0 ${
           isChatOpen 
-            ? 'flex-1 p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 w-auto' 
-            : 'w-0 p-0 opacity-0 scale-[0.05] translate-x-12 translate-y-12'
+            ? 'flex-1 p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 w-auto pointer-events-auto' 
+            : 'w-0 p-0 opacity-0 scale-[0.05] translate-x-12 translate-y-12 pointer-events-none'
         }`}
       >
         <div className="h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-2xl border border-white/40 min-w-[500px]">

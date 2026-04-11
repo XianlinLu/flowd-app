@@ -44,7 +44,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
     
     return (
       <div 
-        className={`relative w-full h-[220px] rounded-3xl p-6 overflow-hidden ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}
+        className={`relative w-full h-[220px] rounded-3xl p-6 ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}
         onClick={() => setActiveGroup({ title, cards: cardsGroup })}
       >
         <div className="absolute top-6 left-6 z-20">

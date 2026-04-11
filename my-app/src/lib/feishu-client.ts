@@ -299,10 +299,40 @@ export class FeishuClient {
   }
 
   private blocksToContent(blocks: any[]): string {
-    // Convert Feishu blocks to plain text
-    return blocks
-      .map(b => b.paragraph?.elements?.map((e: any) => e.text_run?.content).join('') || '')
-      .join('\n\n');
+    // Convert Feishu blocks to plain text. Feishu blocks structure can vary deeply.
+    if (!blocks || !Array.isArray(blocks)) return '';
+    let content = '';
+    for (const b of blocks) {
+      if (b.block_type === 1) { // Text
+        const elements = b.text?.elements || [];
+        content += elements.map((e: any) => e.text_run?.content || '').join('') + '\n';
+      } else if (b.block_type === 2) { // Heading 1
+        const elements = b.heading1?.elements || [];
+        content += '# ' + elements.map((e: any) => e.text_run?.content || '').join('') + '\n';
+      } else if (b.block_type === 3) { // Heading 2
+        const elements = b.heading2?.elements || [];
+        content += '## ' + elements.map((e: any) => e.text_run?.content || '').join('') + '\n';
+      } else if (b.block_type === 4) { // Heading 3
+        const elements = b.heading3?.elements || [];
+        content += '### ' + elements.map((e: any) => e.text_run?.content || '').join('') + '\n';
+      } else if (b.block_type === 12) { // Bullet list
+        const elements = b.bullet?.elements || [];
+        content += '- ' + elements.map((e: any) => e.text_run?.content || '').join('') + '\n';
+      } else if (b.block_type === 13) { // Ordered list
+        const elements = b.ordered?.elements || [];
+        content += '1. ' + elements.map((e: any) => e.text_run?.content || '').join('') + '\n';
+      } else if (b.block_type === 14) { // Code block
+        const elements = b.code?.elements || [];
+        content += '```\n' + elements.map((e: any) => e.text_run?.content || '').join('') + '\n```\n';
+      } else {
+        // Try fallback parsing for other block types
+        const key = Object.keys(b).find(k => typeof b[k] === 'object' && b[k]?.elements);
+        if (key) {
+          content += b[key].elements.map((e: any) => e.text_run?.content || '').join('') + '\n';
+        }
+      }
+    }
+    return content.trim();
   }
 
   private cardToFields(card: Card): Record<string, any> {

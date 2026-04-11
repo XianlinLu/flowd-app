@@ -38,6 +38,13 @@ export interface Card {
     url?: string;
     urlTitle?: string;
     summary?: string;
+    // 附件 (如图片)
+    attachment?: {
+      name: string;
+      type: string;
+      size: number;
+      url?: string;
+    };
   };
 }
 

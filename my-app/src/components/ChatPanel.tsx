@@ -414,6 +414,10 @@ export function ChatPanel({
       const newCards = extractNewCardsFromResponse(fullContent);
       if (newCards.length > 0) {
         let createdCount = 0;
+        
+        // Find the last attachment in the conversation
+        const lastAttachment = [...messages].reverse().find(m => m.attachment)?.attachment;
+        
         newCards.forEach((cardData) => {
           const newCard = boardStore.addCard(cardData.category, {
             title: cardData.title,
@@ -422,6 +426,7 @@ export function ChatPanel({
               tags: cardData.tags,
               aiGenerated: true,
               items: cardData.items,
+              ...(cardData.hasAttachment && lastAttachment ? { attachment: lastAttachment } : {})
             },
           });
           if (newCard) createdCount++;
@@ -839,6 +844,10 @@ export function ChatPanel({
       const newCards = extractNewCardsFromResponse(fullContent);
       if (newCards.length > 0) {
         let createdCount = 0;
+        
+        // Find the last attachment in the conversation
+        const lastAttachment = [...apiMessages].reverse().find(m => m.attachment)?.attachment;
+        
         newCards.forEach((cardData) => {
           const newCard = boardStore.addCard(cardData.category, {
             title: cardData.title,
@@ -847,6 +856,7 @@ export function ChatPanel({
               tags: cardData.tags,
               aiGenerated: true,
               items: cardData.items,
+              ...(cardData.hasAttachment && lastAttachment ? { attachment: lastAttachment } : {})
             },
           });
           if (newCard) createdCount++;

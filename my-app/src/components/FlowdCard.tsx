@@ -7,7 +7,7 @@ interface FlowdCardProps {
   card: Card;
   onUpdate?: (id: string, updates: Partial<Card>) => void;
   onDelete?: (id: string) => void;
-  onAddToBoard?: (suggestion: { title: string; content: string; category: ContentCategory; items?: string[] }) => void;
+  onAddToBoard?: (cardData: { title: string; content: string; category: ContentCategory; items?: string[]; attachment?: any }) => void;
   onChat?: (card: Card) => void; // 点击 Chat 按钮，将卡片发送到右侧讨论
   onClick?: (card: Card) => void; // 点击卡片整体
   isModal?: boolean; // 是否在弹窗中渲染
@@ -223,17 +223,18 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
         {/* Content if no items (Removed per request, TODO cards should only show title and checkbox items) */}
 
         {/* Add to board button for AI suggestions */}
-        {onAddToBoard && card.metadata?.aiGenerated && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToBoard({
-                title: card.title,
-                content: card.content,
-                category: card.category,
-                items: card.metadata?.items,
-              });
-            }}
+      {onAddToBoard && card.metadata?.aiGenerated && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToBoard({
+              title: card.title,
+              content: card.content,
+              category: card.category,
+              items: card.metadata?.items,
+              attachment: card.metadata?.attachment,
+            });
+          }}
             className="mt-6 flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border transition-colors hover:bg-white/10"
             style={{ color: config.textColor, borderColor: 'rgba(255,255,255,0.3)' }}
           >
@@ -498,107 +499,136 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
   }
 
   // Default card rendering for other types
+  const hasImage = card.metadata?.attachment?.type.startsWith('image/') && card.metadata.attachment.url;
+
   return (
     <div
-      className={`card-note p-4 mb-3 cursor-pointer hover:shadow-lg transition-all duration-200 group animate-fade-in relative overflow-hidden flex flex-col ${!isModal ? 'max-h-[420px]' : ''}`}
+      className={`card-note mb-3 cursor-pointer hover:shadow-lg transition-all duration-200 group animate-fade-in relative overflow-hidden flex flex-col rounded-[20px] ${!isModal ? 'max-h-[420px]' : ''}`}
       onClick={() => onClick ? onClick(card) : setIsExpanded(!isExpanded)}
+      style={{ backgroundColor: config.bgColor }}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span 
-            className="text-xs font-bold px-2 py-0.5 rounded"
-            style={{ 
-              backgroundColor: config.bgColor,
-              color: config.color 
-            }}
-          >
-            {CATEGORY_LABELS[card.category] || config.label}
-          </span>
-          {card.status === 'synced' && (
-            <span className="text-[10px] text-gray-400 font-medium">
-              已同步
-            </span>
+      {/* Top Image if available */}
+      {hasImage && (
+        <div className="w-full h-40 bg-gray-200 overflow-hidden shrink-0 relative">
+          <img 
+            src={card.metadata!.attachment!.url} 
+            alt={card.metadata!.attachment!.name}
+            className="w-full h-full object-cover"
+          />
+          {!isModal && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.(card.id);
+              }}
+              className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 bg-black/40 hover:bg-black/60 rounded-full text-white"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           )}
         </div>
-        {!isModal && (
+      )}
+
+      <div className={`flex flex-col flex-1 min-h-0 ${hasImage ? 'p-5' : 'p-4'}`}>
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span 
+              className="text-[10px] font-bold tracking-widest uppercase rounded"
+              style={{ 
+                color: hasImage ? 'rgba(0,0,0,0.4)' : config.color 
+              }}
+            >
+              {hasImage ? 'NOTE' : (CATEGORY_LABELS[card.category] || config.label)}
+            </span>
+            {card.status === 'synced' && (
+              <span className="text-[10px] text-gray-400 font-medium">
+                已同步
+              </span>
+            )}
+          </div>
+          {!hasImage && !isModal && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.(card.id);
+              }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-black/10 rounded"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: config.textColor }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Title */}
+        <h4 
+          className={`font-medium text-[18px] mt-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-3' : ''}`}
+          style={{ color: config.textColor }}
+        >
+          {card.title}
+        </h4>
+
+        {/* Content */}
+        {(isExpanded || card.content.length < 80) && card.content !== card.title && (
+          <div className={`relative mt-2 ${!isModal ? 'flex-1 overflow-hidden' : ''}`}>
+            <p 
+              className={`text-[16px] leading-[24px] opacity-80 ${!isModal ? 'line-clamp-10' : ''}`}
+              style={{ color: config.textColor }}
+            >
+              {card.content}
+            </p>
+            {!isModal && (
+              <div className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none" style={{ background: `linear-gradient(to bottom, transparent, ${config.bgColor})` }} />
+            )}
+          </div>
+        )}
+
+        {/* Tags */}
+        {card.metadata?.tags && card.metadata.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {card.metadata.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="text-[10px] px-2 py-0.5 rounded-full"
+                style={{ 
+                  backgroundColor: 'rgba(0,0,0,0.05)',
+                  color: config.textColor,
+                  opacity: 0.7
+                }}
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Add to board button for AI suggestions */}
+        {onAddToBoard && card.metadata?.aiGenerated && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete?.(card.id);
+              onAddToBoard({
+                title: card.title,
+                content: card.content,
+                category: card.category,
+                items: card.metadata?.items,
+                attachment: card.metadata?.attachment,
+              });
             }}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-black/10 rounded"
+            className="mt-3 flex items-center gap-1 text-[10px] font-medium px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+            style={{ color: config.textColor }}
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: config.textColor }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <span>+ 添加到看板</span>
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </button>
         )}
       </div>
-
-      {/* Title */}
-      <h4 
-        className={`font-medium text-[18px] mt-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-3' : ''}`}
-        style={{ color: config.textColor }}
-      >
-        {card.title}
-      </h4>
-
-      {/* Content */}
-      {(isExpanded || card.content.length < 80) && card.content !== card.title && (
-        <div className={`relative mt-2 ${!isModal ? 'flex-1 overflow-hidden' : ''}`}>
-          <p 
-            className={`text-[16px] leading-[24px] opacity-80 ${!isModal ? 'line-clamp-10' : ''}`}
-            style={{ color: config.textColor }}
-          >
-            {card.content}
-          </p>
-          {!isModal && (
-            <div className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none" style={{ background: `linear-gradient(to bottom, transparent, ${config.bgColor})` }} />
-          )}
-        </div>
-      )}
-
-      {/* Tags */}
-      {card.metadata?.tags && card.metadata.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {card.metadata.tags.map((tag, idx) => (
-            <span
-              key={idx}
-              className="text-[10px] px-2 py-0.5 rounded-full"
-              style={{ 
-                backgroundColor: 'rgba(0,0,0,0.05)',
-                color: config.textColor,
-                opacity: 0.7
-              }}
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Add to board button for AI suggestions */}
-      {onAddToBoard && card.metadata?.aiGenerated && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddToBoard({
-              title: card.title,
-              content: card.content,
-              category: card.category,
-              items: card.metadata?.items,
-            });
-          }}
-          className="mt-3 flex items-center gap-1 text-[10px] font-medium px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
-          style={{ color: config.textColor }}
-        >
-          <span>+ 添加到看板</span>
-          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </button>
-      )}
     </div>
   );
 }

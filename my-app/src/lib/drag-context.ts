@@ -127,6 +127,7 @@ export function extractNewCardsFromResponse(response: string): Array<{
   content: string;
   tags: string[];
   items?: string[];
+  hasAttachment?: boolean;
 }> {
   const cards: Array<{
     category: ContentCategory;
@@ -134,6 +135,7 @@ export function extractNewCardsFromResponse(response: string): Array<{
     content: string;
     tags: string[];
     items?: string[];
+    hasAttachment?: boolean;
   }> = [];
 
   // 尝试提取 JSON 格式1（{ "newCards": [...] }）
@@ -150,6 +152,7 @@ export function extractNewCardsFromResponse(response: string): Array<{
               content: card.content || card.title,
               tags: card.tags || [],
               items: card.items,
+              hasAttachment: card.hasAttachment,
             });
           }
         });
@@ -173,6 +176,7 @@ export function extractNewCardsFromResponse(response: string): Array<{
               content: card.content || card.title,
               tags: card.tags || [],
               items: card.items,
+              hasAttachment: card.hasAttachment,
             });
           }
         });

@@ -37,8 +37,8 @@ const SMART_BUTTONS = [
   { id: 'refresh', label: '刷新总结' },
   { id: 'thoughts', label: '思考建议' },
   { id: 'prioritize', label: '优先级排序' },
+  { id: 'sync_feishu', label: '同步飞书数据' },
   { id: 'summarize', label: '汇总' },
-  { id: 'missing', label: '还缺什么？' },
 ];
 
 // Helper function to call chat API
@@ -887,6 +887,124 @@ export function ChatPanel({
   };
 
   const handleSmartButton = async (buttonId: string) => {
+    if (buttonId === 'sync_feishu') {
+      if (!feishuConfig) {
+        setMessages(prev => [...prev, {
+          id: `msg_${Date.now()}_assistant`,
+          role: 'assistant',
+          content: '请先在左侧面板绑定飞书多维表格或云文档。',
+          timestamp: Date.now()
+        }]);
+        setTimeout(scrollToBottom, 100);
+        return;
+      }
+      
+      setIsLoading(true);
+      setPetState('thinking');
+      setMessages(prev => [...prev, {
+        id: `msg_${Date.now()}_sync_start`,
+        role: 'assistant',
+        content: `开始同步绑定的飞书数据...`,
+        timestamp: Date.now()
+      }]);
+      
+      try {
+        const res = await fetch('/api/feishu/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ feishuConfig, direction: 'import' })
+        });
+        const data = await res.json();
+        
+        if (!data.success) throw new Error(data.error);
+
+        if (data.type === 'doc') {
+          // Request LLM to parse the raw text
+          const docText = data.content.substring(0, 3000); // limit context
+          const prompt = `你是一个智能项目助手。下面是从飞书文档同步回来的最新内容，请你提取里面的关键信息，并且**直接**以JSON数组的格式输出，不要有任何多余的解释。JSON格式如下：
+\`\`\`json
+[
+  {
+    "title": "卡片标题",
+    "content": "卡片详细描述",
+    "category": "note",
+    "tags": ["同步", "文档"]
+  }
+]
+\`\`\`
+可用的category包含: note(笔记), decided(决策), todo(待办), open_question(问题), prd(需求)。
+这是最新文档内容：
+${docText}
+`;
+          let fullContent = '';
+          for await (const chunk of streamChat([{ id: 'tmp', role: 'user', content: prompt, timestamp: Date.now() }], FLOWD_SYSTEM_PROMPT)) {
+            fullContent += chunk;
+            setStreamingContent(fullContent);
+          }
+
+          const newCards = extractNewCardsFromResponse(fullContent);
+          let createdCount = 0;
+          if (newCards.length > 0) {
+            newCards.forEach((cardData) => {
+              const newCard = boardStore.addCard(cardData.category, {
+                title: cardData.title,
+                content: cardData.content,
+                metadata: { tags: cardData.tags, aiGenerated: true },
+              });
+              if (newCard) createdCount++;
+            });
+          }
+          
+          setMessages(prev => {
+            const msgs = [...prev];
+            msgs[msgs.length - 1] = {
+              ...msgs[msgs.length - 1],
+              content: createdCount > 0 
+                ? `✅ 已成功同步并从文档提取了 ${createdCount} 张卡片更新至看板。`
+                : `✅ 已同步文档，但未提取到新的结构化卡片。`
+            };
+            return msgs;
+          });
+          if (createdCount > 0) onCardsGenerated?.(createdCount);
+        } else if (data.type === 'bitable') {
+          const cards = data.cards || [];
+          let imported = 0;
+          cards.forEach((card: any) => {
+            const added = boardStore.addCard(card.category || 'note', {
+              title: card.title,
+              content: card.content,
+              metadata: card.metadata,
+            });
+            if (added) imported++;
+          });
+          setMessages(prev => {
+            const msgs = [...prev];
+            msgs[msgs.length - 1] = {
+              ...msgs[msgs.length - 1],
+              content: `✅ 成功从飞书多维表格同步了 ${imported} 张卡片。`
+            };
+            return msgs;
+          });
+          if (imported > 0) onCardsGenerated?.(imported);
+        }
+      } catch (e) {
+        console.error('Sync failed', e);
+        setMessages(prev => {
+          const msgs = [...prev];
+          msgs[msgs.length - 1] = {
+            ...msgs[msgs.length - 1],
+            content: `❌ 同步失败，请检查绑定配置或权限。`
+          };
+          return msgs;
+        });
+      } finally {
+        setIsLoading(false);
+        setStreamingContent('');
+        setPetState('normal');
+      }
+      return;
+    }
+
     setIsLoading(true);
     
     try {

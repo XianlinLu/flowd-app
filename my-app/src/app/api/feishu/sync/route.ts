@@ -18,59 +18,62 @@ const typeToCategory: Record<CardType, ContentCategory> = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { appId, appSecret, appToken, tableId, direction = 'export' } = body;
+    const { feishuConfig, direction = 'import' } = body;
 
     // 从 cookies 中获取用户授权 token
     const userTokenCookie = request.cookies.get('feishu_token');
     const userAccessToken = userTokenCookie?.value;
 
-    if (!appId || !appSecret) {
+    if (!feishuConfig) {
       return NextResponse.json(
-        { error: 'Feishu credentials required' },
+        { error: 'Feishu config is required' },
         { status: 400 }
       );
     }
 
     const client = getFeishuClient({ 
-      appId, 
-      appSecret,
       userAccessToken // 传入用户 token，确保以用户身份执行
     });
 
     if (direction === 'export') {
-      // Export cards to Feishu Bitable
-      const cards = boardStore.getAllCards();
-      const result = await client.syncCardsToBitable(appToken, tableId, cards, {
-        batchSize: 100,
-        maxRecords: 5000,
-      });
-
-      return NextResponse.json({
-        success: true,
-        direction: 'export',
-        ...result,
-      });
-    } else {
-      // Import cards from Feishu Bitable
-      const cards = await client.loadCardsFromBitable(appToken, tableId);
-      
-      // Add imported cards to board
-      let imported = 0;
-      for (const card of cards) {
-        const category = typeToCategory[card.type] || 'note';
-        const added = boardStore.addCard(category, {
-          title: card.title,
-          content: card.content,
-          metadata: card.metadata,
+      // Export cards to Feishu Bitable (Currently not deeply used by UI)
+      if (feishuConfig.bindType === 'bitable' && feishuConfig.appToken && feishuConfig.tableId) {
+        const cards = boardStore.getAllCards();
+        const result = await client.syncCardsToBitable(feishuConfig.appToken, feishuConfig.tableId, cards, {
+          batchSize: 100,
+          maxRecords: 5000,
         });
-        if (added) imported++;
-      }
 
-      return NextResponse.json({
-        success: true,
-        direction: 'import',
-        imported,
-      });
+        return NextResponse.json({
+          success: true,
+          direction: 'export',
+          ...result,
+        });
+      }
+      return NextResponse.json({ error: 'Export not supported for this config type' }, { status: 400 });
+    } else {
+      // Import / Pull data from Feishu
+      if (feishuConfig.bindType === 'doc' && feishuConfig.documentId) {
+        // Fetch document content
+        const rawContent = await client.getDocumentContent(feishuConfig.documentId);
+        return NextResponse.json({
+          success: true,
+          direction: 'import',
+          type: 'doc',
+          content: rawContent
+        });
+      } else if (feishuConfig.appToken && feishuConfig.tableId) {
+        // Fetch from bitable
+        const cards = await client.loadCardsFromBitable(feishuConfig.appToken, feishuConfig.tableId);
+        return NextResponse.json({
+          success: true,
+          direction: 'import',
+          type: 'bitable',
+          cards: cards
+        });
+      }
+      
+      return NextResponse.json({ error: 'Invalid feishu config for import' }, { status: 400 });
     }
   } catch (error) {
     console.error('Feishu sync error:', error);

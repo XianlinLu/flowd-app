@@ -149,8 +149,8 @@ export class FeishuClient {
   }
 
   async getDocumentContent(documentId: string): Promise<string> {
-    const response = await this.request(`/docx/v1/documents/${documentId}/content`);
-    return this.blocksToContent(response.data.content);
+    const response = await this.request(`/docx/v1/documents/${documentId}/blocks`);
+    return this.blocksToContent(response.data.items);
   }
 
   // Bitable Operations

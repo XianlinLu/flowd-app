@@ -153,12 +153,16 @@ export class FeishuClient {
   }
 
   async createDocument(title: string, content?: string, folderToken?: string): Promise<FeishuDocument> {
+    const body: any = {
+      title,
+    };
+    if (folderToken) {
+      body.folder_token = folderToken;
+    }
+    
     const response = await this.request('/docx/v1/documents', {
       method: 'POST',
-      body: JSON.stringify({
-        title,
-        folder_token: folderToken || '',
-      }),
+      body: JSON.stringify(body),
     });
 
     const documentId = response.data.document.document_id;
@@ -178,10 +182,12 @@ export class FeishuClient {
 
   async updateDocumentContent(documentId: string, content: string): Promise<void> {
     const blocks = this.contentToBlocks(content);
-    await this.request(`/docx/v1/documents/${documentId}/blocks`, {
+    // Fetch the root block ID (which is same as documentId) to append children
+    const response = await this.request(`/docx/v1/documents/${documentId}/blocks/${documentId}/children`, {
       method: 'POST',
       body: JSON.stringify({
         children: blocks,
+        index: -1 // append at the end
       }),
     });
   }
@@ -321,14 +327,14 @@ export class FeishuClient {
   // Helper methods
   private contentToBlocks(content: string): any[] {
     // Simple text to Feishu blocks conversion
-    const paragraphs = content.split('\n\n');
+    const paragraphs = content.split('\n'); // Split by single newline instead of double to preserve lines better
     return paragraphs.map(p => ({
-      block_type: 'paragraph',
-      paragraph: {
+      block_type: 2, // 2 is for Text in docx API (1 is for page)
+      text: {
         elements: [
           {
             text_run: {
-              content: p,
+              content: p || ' ', // API fails on empty strings, use space
             },
           },
         ],

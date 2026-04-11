@@ -77,11 +77,11 @@ export class FeishuClient {
     return this.tenantAccessToken!;
   }
 
-  private async request(endpoint: string, options: RequestInit = {}): Promise<any> {
+  private async request(endpoint: string, options: RequestInit = {}, retryCount = 0): Promise<any> {
     // 优先使用用户的 user_access_token，如果没有则回退使用 tenant_access_token
-    const token = this.config.userAccessToken || await this.getTenantAccessToken();
+    let token = this.config.userAccessToken || await this.getTenantAccessToken();
     
-    const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
+    let response = await fetch(`${this.config.baseUrl}${endpoint}`, {
       ...options,
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -92,10 +92,48 @@ export class FeishuClient {
 
     if (!response.ok) {
       const errorText = await response.text();
+      
+      // 处理 Token 失效或无效 (例如 code 99991677, 99991663 等)
+      if (
+        (response.status === 400 || response.status === 401) && 
+        (errorText.includes('99991677') || errorText.includes('99991663') || errorText.includes('token expired')) &&
+        retryCount < 1
+      ) {
+        console.warn('Feishu token invalid or expired. Retrying...', errorText);
+        
+        if (this.config.userAccessToken) {
+          // 如果是 userAccessToken 过期，清除它并降级使用 tenantAccessToken
+          this.config.userAccessToken = undefined;
+        } else {
+          // 如果是 tenantAccessToken 过期，清除缓存强制重新获取
+          this.tenantAccessToken = null;
+          this.tokenExpiry = 0;
+        }
+        
+        return this.request(endpoint, options, retryCount + 1);
+      }
+
       throw new Error(`Feishu API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    
+    // Feishu API 经常返回 200 OK，但内容里带有 code !== 0 且可能代表 token 失效
+    if (data.code && data.code !== 0) {
+      if ((data.code === 99991677 || data.code === 99991663) && retryCount < 1) {
+        console.warn('Feishu token invalid or expired in 200 OK response. Retrying...', data);
+        if (this.config.userAccessToken) {
+          this.config.userAccessToken = undefined;
+        } else {
+          this.tenantAccessToken = null;
+          this.tokenExpiry = 0;
+        }
+        return this.request(endpoint, options, retryCount + 1);
+      }
+      throw new Error(`Feishu API error: code ${data.code} - ${data.msg}`);
+    }
+
+    return data;
   }
 
   async replyMessage(messageId: string, content: string): Promise<any> {

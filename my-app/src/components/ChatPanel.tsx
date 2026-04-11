@@ -535,8 +535,8 @@ export function ChatPanel({
     }
 
     const { isMatch, isDecision } = isIdeaOrDecision(content);
-    // If it doesn't match idea patterns, but has an image with some descriptive text, we can still save it
-    if (!isMatch && !(file && content.length > 5)) return false;
+    // If it doesn't match idea patterns, but has an image with some descriptive text or just an image, we can still save it
+    if (!isMatch && !file) return false;
 
     // Extract title from first sentence or first 30 chars
     let title = content.split(/[。！？.!?]/)[0].substring(0, 30);

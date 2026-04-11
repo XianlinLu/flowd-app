@@ -1293,33 +1293,52 @@ ${docText}
 
         {/* Bottom Input Area with Drop Zone */}
         <div className="border-t border-gray-200/50 relative">
-          {/* Dropped Card Tag */}
-          {droppedCard && (
-            <div className="px-5 pt-3">
-              <div className="flex items-center gap-2">
-                <div className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-200/50">
-                  <span className="text-[10px] font-medium text-gray-500 uppercase">
-                    {droppedCard.category === 'decided' ? 'DECIDED' :
-                     droppedCard.category === 'todo' ? 'TODO' :
-                     droppedCard.category === 'open_question' ? 'OPEN QUESTION' :
-                     droppedCard.category === 'note' ? 'NOTE' : 'DOC'}
-                  </span>
-                  <span className="text-xs text-gray-700">{droppedCard.title}</span>
-                  <button
-                    onClick={handleCancelDrop}
-                    className="ml-1 text-gray-400 hover:text-gray-600"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          {/* Smart Buttons & Upload Previews */}
+          <div className="px-5 pt-3 pb-2 flex flex-col gap-2">
+            {/* File Preview Area (Now sits above smart buttons) */}
+            {(droppedCard || selectedFile) && (
+              <div className="flex flex-wrap gap-2">
+                {droppedCard && (
+                  <div className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-200/50">
+                    <span className="text-[10px] font-medium text-gray-500 uppercase">
+                      {droppedCard.category === 'decided' ? 'DECIDED' :
+                       droppedCard.category === 'todo' ? 'TODO' :
+                       droppedCard.category === 'open_question' ? 'OPEN QUESTION' :
+                       droppedCard.category === 'note' ? 'NOTE' : 'DOC'}
+                    </span>
+                    <span className="text-[14px] text-gray-700 truncate max-w-[150px]">{droppedCard.title}</span>
+                    <button
+                      onClick={handleCancelDrop}
+                      className="ml-1 text-gray-400 hover:text-gray-600"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                {selectedFile && (
+                  <div className="inline-flex items-center gap-2 bg-white rounded-full px-3 py-1.5 border border-gray-200 shadow-sm">
+                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                     </svg>
-                  </button>
-                </div>
+                    <span className="text-[14px] font-medium text-gray-700 truncate max-w-[150px]">
+                      {selectedFile.name}
+                    </span>
+                    <button
+                      onClick={() => setSelectedFile(null)}
+                      className="text-gray-400 hover:text-gray-600 ml-1"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Smart Buttons */}
-          <div className="px-5 pt-3 pb-2">
+            {/* Smart Buttons */}
             <div className="flex flex-wrap gap-2">
               {SMART_BUTTONS.map((btn) => (
                 <button
@@ -1371,28 +1390,8 @@ ${docText}
               </div>
             </div>
             
-            {/* File Preview Area */}
-            {selectedFile && (
-              <div className="absolute top-0 left-5 right-5 -mt-10 px-4 flex items-center z-10">
-                <div className="inline-flex items-center gap-2 bg-white rounded-lg px-3 py-1.5 border border-gray-200 shadow-sm">
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                  </svg>
-                  <span className="text-xs font-medium text-gray-700 truncate max-w-[150px]">
-                    {selectedFile.name}
-                  </span>
-                  <button
-                    onClick={() => setSelectedFile(null)}
-                    className="text-gray-400 hover:text-gray-600 ml-1"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            )}
-
+            {/* File Preview Area (Removed from absolute position, moved above) */}
+            
             <div className="relative w-full mt-2">
               <textarea
                 value={input}

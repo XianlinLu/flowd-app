@@ -29,10 +29,22 @@ class BoardStore {
   ];
   private listeners: Set<() => void> = new Set();
   private currentProjectId: string | null = null;
+  private currentUserId: string = '';
 
   constructor() {
     if (typeof window !== 'undefined') {
       this.loadFromLocalStorage();
+    }
+  }
+
+  setUserId(userId: string) {
+    if (this.currentUserId !== userId) {
+      if (this.currentProjectId) {
+        this.saveToLocalStorage();
+      }
+      this.currentUserId = userId;
+      this.loadFromLocalStorage();
+      this.notify();
     }
   }
 
@@ -49,7 +61,8 @@ class BoardStore {
   }
 
   private getStorageKey() {
-    return this.currentProjectId ? `flowd_board_${this.currentProjectId}` : 'flowd_board_default';
+    const userPrefix = this.currentUserId ? `${this.currentUserId}_` : '';
+    return this.currentProjectId ? `flowd_board_${userPrefix}${this.currentProjectId}` : `flowd_board_${userPrefix}default`;
   }
 
   private saveToLocalStorage() {

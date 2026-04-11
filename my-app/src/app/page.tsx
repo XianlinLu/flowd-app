@@ -27,6 +27,11 @@ export default function Home() {
   const [bindSuccessMessage, setBindSuccessMessage] = useState<{ tableName: string; timestamp: number } | null>(null);
 
   const [mounted, setMounted] = useState(false);
+  const [userId, setUserId] = useState('');
+
+  // Helper to get namespaced storage keys
+  const getProjectsKey = (uid: string) => uid ? `flowd_projects_${uid}` : 'flowd_projects';
+  const getCurrentProjectKey = (uid: string) => uid ? `flowd_current_project_id_${uid}` : 'flowd_current_project_id';
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -39,11 +44,29 @@ export default function Home() {
   }, [isFullScreenMode]);
 
   useEffect(() => {
-    setMounted(true);
     if (typeof window !== 'undefined') {
+      let currentUserId = '';
+      const userCookie = document.cookie.split('; ').find(row => row.startsWith('feishu_user='));
+      if (userCookie) {
+        try {
+          let userValue = userCookie.substring('feishu_user='.length);
+          while (userValue.includes('%')) {
+            const decoded = decodeURIComponent(userValue);
+            if (decoded === userValue) break;
+            userValue = decoded;
+          }
+          const user = JSON.parse(userValue);
+          currentUserId = user.open_id || '';
+        } catch (e) {
+          console.error('Failed to parse user cookie', e);
+        }
+      }
+      setUserId(currentUserId);
+      boardStore.setUserId(currentUserId);
+
       try {
-        const storedProjects = localStorage.getItem('flowd_projects');
-        const storedCurrentProjectId = localStorage.getItem('flowd_current_project_id');
+        const storedProjects = localStorage.getItem(getProjectsKey(currentUserId));
+        const storedCurrentProjectId = localStorage.getItem(getCurrentProjectKey(currentUserId));
         
         if (storedProjects) {
           const parsedProjects = JSON.parse(storedProjects);
@@ -69,6 +92,7 @@ export default function Home() {
         ]);
         boardStore.setProjectId('1');
       }
+      setMounted(true);
     }
   }, []);
 
@@ -76,24 +100,24 @@ export default function Home() {
   useEffect(() => {
     if (mounted && typeof window !== 'undefined') {
       try {
-        localStorage.setItem('flowd_projects', JSON.stringify(projects));
+        localStorage.setItem(getProjectsKey(userId), JSON.stringify(projects));
       } catch (e) {
         console.error('Failed to save projects to localStorage', e);
       }
     }
-  }, [projects, mounted]);
+  }, [projects, mounted, userId]);
 
   // Save current project id to localStorage whenever it changes
   useEffect(() => {
     if (mounted && typeof window !== 'undefined') {
       try {
-        localStorage.setItem('flowd_current_project_id', currentProjectId);
+        localStorage.setItem(getCurrentProjectKey(userId), currentProjectId);
         boardStore.setProjectId(currentProjectId);
       } catch (e) {
         console.error('Failed to save current project id to localStorage', e);
       }
     }
-  }, [currentProjectId, mounted]);
+  }, [currentProjectId, mounted, userId]);
 
   // Sync artifacts count dynamically based on the current board store stats
   useEffect(() => {
@@ -322,7 +346,7 @@ export default function Home() {
       {/* Left Side - Board Panel */}
       <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isChatOpen ? 'w-[380px]' : 'flex-1 w-full'}`}>
         <LeftPanel 
-          key={`left-${currentProjectId}`}
+          key={`left-${userId}-${currentProjectId}`}
           projectName={currentProject?.name || '新项目'}
           isFeishuSynced={!!currentProject?.feishuConfig?.appToken}
           onCardCountChange={setCardCount}
@@ -346,9 +370,10 @@ export default function Home() {
       >
         <div className="h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-2xl border border-white/40 min-w-[500px]">
           <ChatPanel 
-          key={`chat-${currentProjectId}`}
+          key={`chat-${userId}-${currentProjectId}`}
           projectId={currentProjectId}
           projectName={currentProject?.name || '新项目'}
+          userId={userId}
           feishuConfig={currentProject?.feishuConfig}
           onCardsGenerated={handleCardsGenerated}
           chatCard={chatCard}

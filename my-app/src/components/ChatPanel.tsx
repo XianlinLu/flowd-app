@@ -14,6 +14,7 @@ import { AISuggestionCards } from './AISuggestionCards';
 interface ChatPanelProps {
   projectId?: string;
   projectName?: string;
+  userId?: string;
   feishuConfig?: {
     appToken: string;
     tableId: string;
@@ -90,6 +91,7 @@ async function* streamChat(messages: Message[], systemPrompt?: string): AsyncGen
 export function ChatPanel({ 
   projectId = 'default',
   projectName = 'Flowd',
+  userId = '',
   feishuConfig,
   onCardsGenerated, 
   chatCard, 
@@ -101,10 +103,12 @@ export function ChatPanel({
   bindSuccessMessage,
   onClearBindSuccessMessage
 }: ChatPanelProps) {
+  const getChatStorageKey = () => userId ? `flowd_chat_${userId}_${projectId}` : `flowd_chat_${projectId}`;
+
   const [messages, setMessages] = useState<Message[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const stored = localStorage.getItem(`flowd_chat_${projectId}`);
+        const stored = localStorage.getItem(getChatStorageKey());
         if (stored) {
           return JSON.parse(stored);
         }
@@ -128,12 +132,12 @@ export function ChatPanel({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem(`flowd_chat_${projectId}`, JSON.stringify(messages));
+        localStorage.setItem(getChatStorageKey(), JSON.stringify(messages));
       } catch (e) {
         console.error('Failed to save messages to localStorage', e);
       }
     }
-  }, [messages, projectId]);
+  }, [messages, projectId, userId]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');

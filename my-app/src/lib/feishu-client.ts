@@ -154,6 +154,11 @@ export class FeishuClient {
   }
 
   // Bitable Operations
+  async getBitableInfo(appToken: string): Promise<{ app: { name: string } }> {
+    const response = await this.request(`/bitable/v1/apps/${appToken}`);
+    return response.data;
+  }
+
   async listBitableRecords(appToken: string, tableId: string, options?: {
     viewId?: string;
     filter?: string;

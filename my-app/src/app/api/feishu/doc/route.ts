@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getFeishuClient } from '@/lib/feishu-client';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const documentId = searchParams.get('document_id');
 
@@ -10,7 +10,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    const feishuClient = getFeishuClient();
+    const userTokenCookie = request.cookies.get('feishu_token');
+    const userAccessToken = userTokenCookie?.value;
+
+    const feishuClient = getFeishuClient({
+      userAccessToken
+    });
     
     // Get doc info
     const data = await feishuClient.getDocument(documentId);

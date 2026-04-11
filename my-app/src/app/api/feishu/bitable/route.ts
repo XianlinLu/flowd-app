@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
+import { getFeishuClient } from '@/lib/feishu-client';
 
 const FEISHU_APP_ID = process.env.FEISHU_APP_ID || 'cli_a94825f251f85bb5';
 const FEISHU_APP_SECRET = process.env.FEISHU_APP_SECRET || 'ELudaGhCdcA6DsLqipylfeJ5NbVrbArg';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const app_token = searchParams.get('app_token');
@@ -12,12 +13,24 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Missing app_token parameter' }, { status: 400 });
     }
 
-    // Mock successful response for demonstration
-    // Since we don't have actual Feishu App credentials configured by default
-    return NextResponse.json({ success: true, name: '飞书多维表格' });
-  } catch (error) {
-    console.error('Feishu Bitable GET Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch Feishu Bitable info', name: '飞书多维表格' }, { status: 500 });
+    const userTokenCookie = request.cookies.get('feishu_token');
+    const userAccessToken = userTokenCookie?.value;
+
+    const feishuClient = getFeishuClient({
+      userAccessToken
+    });
+
+    // Actually fetch the bitable info
+    const data = await feishuClient.getBitableInfo(app_token);
+    
+    if (!data || !data.app) {
+      throw new Error('Failed to get bitable info');
+    }
+
+    return NextResponse.json({ success: true, name: data.app.name });
+  } catch (error: any) {
+    console.error('Feishu Bitable GET Error:', error.message || error);
+    return NextResponse.json({ error: error.message || 'Failed to fetch Feishu Bitable info', name: '飞书多维表格' }, { status: 500 });
   }
 }
 

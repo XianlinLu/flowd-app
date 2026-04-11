@@ -519,7 +519,7 @@ export function ChatPanel({
   };
 
   // Auto save user idea to board
-  const autoSaveIdeaToBoard = (content: string, file: File | null): boolean => {
+  const autoSaveIdeaToBoard = async (content: string, file: File | null): Promise<boolean> => {
     // Check if it's asking for tasks first
     if (isAskingForTasks(content)) {
       const newCard = boardStore.addCard('open_question', {
@@ -551,6 +551,17 @@ export function ChatPanel({
       category = 'decided';
     }
 
+    let fileUrl = '';
+    if (file) {
+      // Convert file to base64 string to persist across reloads
+      fileUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = () => resolve(URL.createObjectURL(file)); // Fallback to blob URL on error
+        reader.readAsDataURL(file);
+      });
+    }
+
     const newCard = boardStore.addCard(category, {
       title: title || '新想法',
       content: content,
@@ -562,7 +573,7 @@ export function ChatPanel({
             name: file.name,
             type: file.type,
             size: file.size,
-            url: URL.createObjectURL(file)
+            url: fileUrl
           }
         } : {})
       },
@@ -658,7 +669,17 @@ export function ChatPanel({
     }
 
     // Auto save idea to board before sending
-    const wasSaved = autoSaveIdeaToBoard(userInput, selectedFile);
+    const wasSaved = await autoSaveIdeaToBoard(userInput, selectedFile);
+
+    let fileUrl = '';
+    if (selectedFile) {
+      fileUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = () => resolve(URL.createObjectURL(selectedFile));
+        reader.readAsDataURL(selectedFile);
+      });
+    }
 
     const userMessage: Message = {
       id: `msg_${Date.now()}_user`,
@@ -670,7 +691,7 @@ export function ChatPanel({
           name: selectedFile.name,
           type: selectedFile.type,
           size: selectedFile.size,
-          url: URL.createObjectURL(selectedFile)
+          url: fileUrl
         }
       } : {})
     };

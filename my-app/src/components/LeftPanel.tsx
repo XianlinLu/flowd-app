@@ -745,17 +745,15 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       {/* About Section Standalone Cards */}
       {sections.flatMap(s => s.cards).filter(card => card.metadata?.isAboutFlowd).map((card) => (
         <div key={card.id} className="animate-slide-in mb-6">
-          <div className="columns-2 gap-3">
-            <div className="break-inside-avoid">
-              <DraggableCard
-                card={card}
-                onUpdate={handleUpdateCard}
-                onDelete={handleDeleteCard}
-                onChat={handleChatCard}
-                onClick={(card) => setSelectedCardId(card.id)}
-                onContextMenu={handleContextMenu}
-              />
-            </div>
+          <div className="grid grid-cols-2 gap-3">
+            <DraggableCard
+              card={card}
+              onUpdate={handleUpdateCard}
+              onDelete={handleDeleteCard}
+              onChat={handleChatCard}
+              onClick={(card) => setSelectedCardId(card.id)}
+              onContextMenu={handleContextMenu}
+            />
           </div>
         </div>
       ))}
@@ -788,18 +786,17 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                   <p className="mt-1">在右侧输入想法，AI 会自动归类</p>
                 </div>
               ) : (
-                <div className="columns-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {displayCards.map((card) => (
-                    <div key={card.id} className="break-inside-avoid">
-                      <DraggableCard
-                        card={card}
-                        onUpdate={handleUpdateCard}
-                        onDelete={handleDeleteCard}
-                        onChat={handleChatCard}
-                        onClick={(card) => setSelectedCardId(card.id)}
-                        onContextMenu={handleContextMenu}
-                      />
-                    </div>
+                    <DraggableCard
+                      key={card.id}
+                      card={card}
+                      onUpdate={handleUpdateCard}
+                      onDelete={handleDeleteCard}
+                      onChat={handleChatCard}
+                      onClick={(card) => setSelectedCardId(card.id)}
+                      onContextMenu={handleContextMenu}
+                    />
                   ))}
                 </div>
               )}

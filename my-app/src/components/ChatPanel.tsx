@@ -1197,7 +1197,12 @@ ${docText}
 
   return (
     <DragContext.Provider value={{ draggedItem, setDraggedItem }}>
-      <div className="h-full flex flex-col relative overflow-hidden bg-[#E6E9EB]">
+      <div 
+        className="h-full flex flex-col relative overflow-hidden bg-[#E6E9EB]"
+        onDragOver={handleInputDragOver}
+        onDragLeave={handleInputDragLeave}
+        onDrop={handleInputDrop}
+      >
         {/* Close Button */}
         {onClose && (
           <button
@@ -1213,6 +1218,15 @@ ${docText}
 
         {/* Background with noise/texture */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.35] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
+
+        {/* Drag overlay - shown when dragging over the entire panel */}
+        {isDragOver && (
+          <div className="absolute inset-0 z-[100] flex items-center justify-center pointer-events-none bg-blue-50/30 backdrop-blur-[1px]">
+            <div className="bg-white rounded-2xl px-8 py-4 shadow-xl border-2 border-blue-400 border-dashed">
+              <span className="text-blue-600 font-medium">释放以添加卡片到对话</span>
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {messages.length === 0 ? (
@@ -1402,9 +1416,6 @@ ${docText}
           {/* Input Area with Drag Drop */}
           <div 
             className="px-5 pb-5 relative"
-            onDragOver={handleInputDragOver}
-            onDragLeave={handleInputDragLeave}
-            onDrop={handleInputDrop}
           >
             {/* Virtual Pet - Positioned strictly above the text area border (gap of 8px) */}
             {isPetVisible && (
@@ -1422,22 +1433,6 @@ ${docText}
               </div>
             )}
 
-            <div className={`
-              relative rounded-2xl transition-all duration-200
-              ${isDragOver ? 'bg-blue-50/50 border-2 border-blue-400 border-dashed' : ''}
-            `}>
-              {isDragOver && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                  <span className="text-sm text-blue-500 font-medium">释放以添加卡片到对话</span>
-                </div>
-              )}
-              <div className={`relative ${isDragOver ? 'opacity-30' : ''}`}>
-                {/* File Preview Area - Moved outside the input relative container */}
-              </div>
-            </div>
-            
-            {/* File Preview Area (Removed from absolute position, moved above) */}
-            
             <div className="relative w-full mt-2">
               <textarea
                 value={input}

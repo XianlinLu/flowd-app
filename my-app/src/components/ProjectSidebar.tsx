@@ -9,9 +9,11 @@ export interface Project {
   isPinned?: boolean;
   createdAt?: number;
   feishuConfig?: {
-    appToken: string;
-    tableId: string;
-    folderToken: string;
+    bindType?: 'bitable' | 'doc';
+    appToken?: string;
+    tableId?: string;
+    folderToken?: string;
+    documentId?: string;
   };
   feishuTableName?: string;
 }
@@ -61,7 +63,7 @@ export function ProjectSidebar({
   const [renameModalId, setRenameModalId] = useState<string | null>(null);
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
   const [bindFeishuModalId, setBindFeishuModalId] = useState<string | null>(null);
-  const [feishuConfigForm, setFeishuConfigForm] = useState({ appToken: '', tableId: '', folderToken: '' });
+  const [feishuConfigForm, setFeishuConfigForm] = useState<{ bindType: 'bitable' | 'doc'; appToken: string; tableId: string; folderToken: string; documentId: string }>({ bindType: 'bitable', appToken: '', tableId: '', folderToken: '', documentId: '' });
   const [newProjectName, setNewProjectName] = useState('');
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   
@@ -190,7 +192,14 @@ export function ProjectSidebar({
                         onClick={(e) => {
                           e.stopPropagation();
                           setBindFeishuModalId(project.id);
-                          setFeishuConfigForm(project.feishuConfig || { appToken: '', tableId: '', folderToken: '' });
+                          const conf = project.feishuConfig || {};
+                          setFeishuConfigForm({
+                            bindType: conf.bindType || 'bitable',
+                            appToken: conf.appToken || '',
+                            tableId: conf.tableId || '',
+                            folderToken: conf.folderToken || '',
+                            documentId: conf.documentId || ''
+                          });
                           setActiveMenuId(null);
                         }}
                         className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
@@ -386,37 +395,70 @@ export function ProjectSidebar({
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-scale-in">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">绑定飞书归档</h3>
+            
+            {/* Type Selector */}
+            <div className="flex bg-gray-100 p-1 rounded-lg mb-6">
+              <button
+                onClick={() => setFeishuConfigForm(prev => ({ ...prev, bindType: 'bitable' }))}
+                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${feishuConfigForm.bindType === 'bitable' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                多维表格
+              </button>
+              <button
+                onClick={() => setFeishuConfigForm(prev => ({ ...prev, bindType: 'doc' }))}
+                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${feishuConfigForm.bindType === 'doc' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                云文档
+              </button>
+            </div>
+
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">多维表格 App Token</label>
-                <input
-                  type="text"
-                  value={feishuConfigForm.appToken}
-                  onChange={(e) => setFeishuConfigForm(prev => ({ ...prev, appToken: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  placeholder="e.g. bascn..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">多维表格 Table ID</label>
-                <input
-                  type="text"
-                  value={feishuConfigForm.tableId}
-                  onChange={(e) => setFeishuConfigForm(prev => ({ ...prev, tableId: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  placeholder="e.g. tbl..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">长文本归档文件夹 Token</label>
-                <input
-                  type="text"
-                  value={feishuConfigForm.folderToken}
-                  onChange={(e) => setFeishuConfigForm(prev => ({ ...prev, folderToken: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  placeholder="e.g. fld..."
-                />
-              </div>
+              {feishuConfigForm.bindType === 'bitable' ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">多维表格 App Token</label>
+                    <input
+                      type="text"
+                      value={feishuConfigForm.appToken}
+                      onChange={(e) => setFeishuConfigForm(prev => ({ ...prev, appToken: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      placeholder="e.g. bascn..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">多维表格 Table ID</label>
+                    <input
+                      type="text"
+                      value={feishuConfigForm.tableId}
+                      onChange={(e) => setFeishuConfigForm(prev => ({ ...prev, tableId: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      placeholder="e.g. tbl..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">长文本归档文件夹 Token (可选)</label>
+                    <input
+                      type="text"
+                      value={feishuConfigForm.folderToken}
+                      onChange={(e) => setFeishuConfigForm(prev => ({ ...prev, folderToken: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      placeholder="e.g. fld..."
+                    />
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">飞书文档 ID</label>
+                  <input
+                    type="text"
+                    value={feishuConfigForm.documentId}
+                    onChange={(e) => setFeishuConfigForm(prev => ({ ...prev, documentId: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    placeholder="e.g. docxcn..."
+                  />
+                  <p className="text-xs text-gray-500 mt-2">系统将读取该文档内容进行上下文同步和内容记录。</p>
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <button

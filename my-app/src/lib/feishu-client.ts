@@ -109,6 +109,11 @@ export class FeishuClient {
   }
 
   // Document Operations
+  async getDocument(documentId: string): Promise<{ document: { title: string; document_id: string } }> {
+    const response = await this.request(`/docx/v1/documents/${documentId}`);
+    return response.data;
+  }
+
   async createDocument(title: string, content?: string, folderToken?: string): Promise<FeishuDocument> {
     const response = await this.request('/docx/v1/documents', {
       method: 'POST',

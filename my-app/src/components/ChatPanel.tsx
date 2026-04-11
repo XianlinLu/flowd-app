@@ -16,9 +16,11 @@ interface ChatPanelProps {
   projectName?: string;
   userId?: string;
   feishuConfig?: {
-    appToken: string;
-    tableId: string;
+    bindType?: 'bitable' | 'doc';
+    appToken?: string;
+    tableId?: string;
     folderToken?: string;
+    documentId?: string;
   };
   onCardsGenerated?: (count: number) => void;
   chatCard?: Card | null;

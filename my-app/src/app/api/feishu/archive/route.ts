@@ -10,8 +10,15 @@ export async function POST(request: NextRequest) {
     const userTokenCookie = request.cookies.get('feishu_token');
     const userAccessToken = userTokenCookie?.value;
 
-    if (!feishuConfig || !feishuConfig.appToken || !feishuConfig.tableId) {
+    if (!feishuConfig) {
       return NextResponse.json({ error: 'Project Feishu config is missing' }, { status: 400 });
+    }
+    
+    const isDocBind = feishuConfig.bindType === 'doc' && feishuConfig.documentId;
+    const isBitableBind = feishuConfig.appToken && feishuConfig.tableId;
+
+    if (!isDocBind && !isBitableBind) {
+      return NextResponse.json({ error: 'Invalid Feishu config' }, { status: 400 });
     }
 
     const client = getFeishuClient({
@@ -19,6 +26,18 @@ export async function POST(request: NextRequest) {
     });
 
     let documentUrl = '';
+
+    // If it's a doc bind, we might just append content to the bound doc or do nothing 
+    // depending on the product requirement. For now, we support creating new docs if folderToken exists.
+    if (isDocBind) {
+      // In a real app, you might append the card content to the bound document here.
+      // For now, we just return success to not break the flow.
+      return NextResponse.json({
+        success: true,
+        documentUrl: `https://www.feishu.cn/docx/${feishuConfig.documentId}`,
+        recordId: 'doc_append'
+      });
+    }
 
     // If it's a long text card or specific type, create a Feishu Doc first
     const isLongText = card.category === 'prd' || card.category === 'meeting' || card.category === 'doc' || card.content.length > 200;

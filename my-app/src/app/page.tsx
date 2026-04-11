@@ -239,8 +239,33 @@ export default function Home() {
   }, []);
 
   const handleBindFeishu = useCallback(async (id: string, feishuConfig: any) => {
-    let tableName = '飞书多维表格';
-    if (feishuConfig?.appToken) {
+    let tableName = feishuConfig?.bindType === 'doc' ? '飞书文档' : '飞书多维表格';
+    
+    if (feishuConfig?.bindType === 'doc' && feishuConfig?.documentId) {
+      try {
+        const res = await fetch(`/api/feishu/doc?document_id=${feishuConfig.documentId}`);
+        const data = await res.json();
+        
+        if (!res.ok || data.error) {
+          console.error('Failed to fetch doc info:', data.error);
+          alert(`绑定失败: ${data.error || '获取飞书文档信息失败，请检查文档 ID 是否正确'}`);
+          throw new Error(data.error || 'Failed to fetch doc info');
+        }
+        
+        if (data.name) {
+          tableName = data.name;
+        }
+
+        // Mock importing data from Feishu to Flowd
+        boardStore.addCard('note', {
+          title: `来自文档 "${tableName}" 的同步配置`,
+          content: `成功绑定了云文档：文档 ID (${feishuConfig.documentId})，已与 Flowd 平台建立关联。`
+        });
+      } catch (e) {
+        console.error('Failed to fetch doc info', e);
+        throw e;
+      }
+    } else if (feishuConfig?.appToken) {
       try {
         const res = await fetch(`/api/feishu/bitable?app_token=${feishuConfig.appToken}`);
         const data = await res.json();
@@ -257,8 +282,8 @@ export default function Home() {
 
         // Mock importing data from Feishu to Flowd
         boardStore.addCard('note', {
-          title: `来自 ${tableName} 的同步数据`,
-          content: `成功绑定了多维表格：App Token (${feishuConfig.appToken})，数据已导入 Flowd 平台。`
+          title: `来自表格 "${tableName}" 的同步配置`,
+          content: `成功绑定了多维表格：App Token (${feishuConfig.appToken})，已与 Flowd 平台建立关联。`
         });
       } catch (e) {
         console.error('Failed to fetch bitable info', e);

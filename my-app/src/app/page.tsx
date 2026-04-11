@@ -415,12 +415,21 @@ export default function Home() {
 
       {/* Floating Logo to reopen chat */}
       {!isChatOpen && (
-        <button
-          onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 z-50 overflow-hidden border border-gray-200 animate-scale-in"
-        >
-          <img src="/logo.png" alt="Open Chat" className="w-10 h-10 object-contain" />
-        </button>
+        <div className="fixed bottom-8 right-8 z-50 group">
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 animate-scale-in relative"
+          >
+            <img src="/logo.png" alt="Open Chat" className="w-10 h-10 object-contain" />
+          </button>
+          
+          <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none transform group-hover:-translate-x-1">
+            <div className="bg-[#2a3036] text-white/90 text-[14px] px-5 py-2 rounded-full shadow-lg whitespace-nowrap flex items-center justify-center border border-white/10 font-medium">
+              询问Flowd
+            </div>
+            <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[6px] border-l-[#2a3036]"></div>
+          </div>
+        </div>
       )}
 
       {/* Notification Toast */}

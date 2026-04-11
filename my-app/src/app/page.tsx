@@ -349,6 +349,7 @@ export default function Home() {
           key={`chat-${currentProjectId}`}
           projectId={currentProjectId}
           projectName={currentProject?.name || '新项目'}
+          feishuConfig={currentProject?.feishuConfig}
           onCardsGenerated={handleCardsGenerated}
           chatCard={chatCard}
           onChatComplete={handleChatComplete}

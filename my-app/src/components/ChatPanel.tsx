@@ -14,6 +14,11 @@ import { AISuggestionCards } from './AISuggestionCards';
 interface ChatPanelProps {
   projectId?: string;
   projectName?: string;
+  feishuConfig?: {
+    appToken: string;
+    tableId: string;
+    folderToken?: string;
+  };
   onCardsGenerated?: (count: number) => void;
   chatCard?: Card | null;
   onChatComplete?: () => void;
@@ -84,7 +89,8 @@ async function* streamChat(messages: Message[], systemPrompt?: string): AsyncGen
 
 export function ChatPanel({ 
   projectId = 'default',
-  projectName = 'Flowd', 
+  projectName = 'Flowd',
+  feishuConfig,
   onCardsGenerated, 
   chatCard, 
   onChatComplete, 
@@ -670,11 +676,11 @@ export function ChatPanel({
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                projectId: 'flowd_mock_project', // Mock ID for testing
+                projectId: projectId, // 使用真实项目ID
                 query: userInput,
                 currentRound: 1, // Mock round
                 isSemantic: true, // 开启轻量化 RAG 语义检索
-                feishuConfig: (window as any).__currentProjectFeishuConfig || {
+                feishuConfig: feishuConfig || {
                 appToken: 'F49FbA8Yha2eX6ssqYecx1tknEd', // Example fallback
                 tableId: 'tblXXX'
               }
@@ -753,11 +759,11 @@ export function ChatPanel({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              projectId: 'flowd_mock_project', // Mock ID
+              projectId: projectId, // 使用真实项目ID
               query: userInput,
               currentRound: 1,
               isSemantic: true,
-              feishuConfig: (window as any).__currentProjectFeishuConfig || {
+              feishuConfig: feishuConfig || {
                 appToken: 'F49FbA8Yha2eX6ssqYecx1tknEd',
                 tableId: 'tblXXX'
               }

@@ -332,11 +332,21 @@ export class FeishuClient {
 let feishuClient: FeishuClient | null = null;
 
 export function getFeishuClient(config?: FeishuConfig): FeishuClient {
-  if (!feishuClient && config) {
-    feishuClient = new FeishuClient(config);
-  }
+  const mergedConfig = {
+    appId: process.env.FEISHU_APP_ID,
+    appSecret: process.env.FEISHU_APP_SECRET,
+    ...config
+  };
+  
   if (!feishuClient) {
-    throw new Error('Feishu client not initialized');
+    feishuClient = new FeishuClient(mergedConfig);
+  } else if (config?.userAccessToken) {
+    // If client exists but we have a new user token, update it
+    // Note: To avoid mutating a true singleton across different user requests in a concurrent environment,
+    // it's actually safer to create a new instance or just pass the token. 
+    // Since this is serverless/edge, we should just return a new instance if we have a userAccessToken
+    // or update the config. Let's return a new instance to be safe.
+    return new FeishuClient(mergedConfig);
   }
   return feishuClient;
 }

@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 
 const FEISHU_APP_ID = process.env.FEISHU_APP_ID || 'cli_a123456789'; // Default placeholder
-const REDIRECT_URI = process.env.NEXT_PUBLIC_URL 
-  ? `${process.env.NEXT_PUBLIC_URL}/api/feishu/callback` 
-  : 'http://localhost:3000/api/feishu/callback';
 
 export async function GET(request: Request) {
   // 如果没有配置真实的飞书应用ID（使用的是默认占位符），为了防止页面报错（20028 app_id 请求不合法），
@@ -14,6 +11,10 @@ export async function GET(request: Request) {
     mockCallbackUrl.searchParams.append('state', 'flowd_login');
     return NextResponse.redirect(mockCallbackUrl.toString());
   }
+
+  // 动态获取当前的请求域名作为回调地址
+  const redirectUrl = new URL('/api/feishu/callback', request.url);
+  const REDIRECT_URI = redirectUrl.toString();
 
   const feishuAuthUrl = new URL('https://open.feishu.cn/open-apis/authen/v1/user_auth_page_beta');
   

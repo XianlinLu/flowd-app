@@ -1257,12 +1257,10 @@ ${docText}
                     {message.role === 'assistant' && !savedMessageIds.has(message.id) && !message.content.startsWith('✅') && (
                       <button
                         onClick={() => handleSaveToBoard(message)}
-                        className="mt-2 flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-700 transition-colors"
+                        className="mt-2 flex items-center gap-1.5 text-[14px] text-[#9EA8B0] font-medium px-4 py-1.5 rounded-full border-2 border-dashed border-[#9EA8B0] hover:bg-[#9EA8B0]/10 hover:text-[#7E898E] hover:border-[#7E898E] transition-all"
                       >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        保存至左边看板
+                        <span className="text-lg leading-none">+</span>
+                        保存至左侧看板
                       </button>
                     )}
                     {message.role === 'assistant' && savedMessageIds.has(message.id) && (

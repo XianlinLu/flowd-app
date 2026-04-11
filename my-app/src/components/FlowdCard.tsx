@@ -44,11 +44,11 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
         className={`p-6 mb-3 cursor-pointer transition-all duration-200 animate-fade-in relative flex flex-col bg-[#1D1D1D] text-white rounded-2xl ${!isModal ? 'max-h-[280px] overflow-hidden group hover:shadow-xl hover:bg-[#252525]' : 'h-full overflow-y-auto'}`}
         onClick={() => onClick ? onClick(card) : setIsExpanded(!isExpanded)}
       >
-        <h4 className="font-semibold text-[22px] mb-4 leading-snug shrink-0 text-white tracking-wide">
+        <h4 className="font-semibold text-[18px] mb-4 leading-snug shrink-0 text-white tracking-wide">
           {card.title}
         </h4>
         <div className={`relative ${!isModal ? 'flex-1 overflow-hidden' : ''}`}>
-          <div className={`text-[16px] leading-relaxed text-[#b3b3b3] space-y-4 ${!isModal ? 'line-clamp-4' : ''}`}>
+          <div className={`text-[16px] leading-[24px] text-[#b3b3b3] space-y-4 ${!isModal ? 'line-clamp-4' : ''}`}>
             {card.content.split('\n\n').map((paragraph, idx) => (
               <p key={idx}>{paragraph}</p>
             ))}
@@ -98,7 +98,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
 
         {/* Title */}
         <h4 
-          className={`font-medium text-[22px] leading-snug mb-4 ${!isModal ? 'line-clamp-6' : ''}`}
+          className={`font-medium text-[18px] leading-snug mb-4 ${!isModal ? 'line-clamp-6' : ''}`}
           style={{ color: config.textColor }}
         >
           {card.title}
@@ -110,7 +110,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
             <span className="text-[10px] tracking-widest uppercase block mb-2" style={{ color: config.textColor, opacity: 0.5 }}>
               ANSWER
             </span>
-            <p className={`text-[16px] leading-relaxed italic ${!isModal ? 'line-clamp-4' : ''}`} style={{ color: config.textColor }}>
+            <p className={`text-[16px] leading-[24px] italic ${!isModal ? 'line-clamp-4' : ''}`} style={{ color: config.textColor }}>
               {card.answer}
             </p>
           </div>
@@ -174,7 +174,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
 
         {/* Title */}
         <h4 
-          className={`font-semibold text-[22px] mb-8 leading-snug tracking-tight shrink-0 ${!isModal ? 'line-clamp-3' : ''}`}
+          className={`font-semibold text-[18px] mb-8 leading-snug tracking-tight shrink-0 ${!isModal ? 'line-clamp-3' : ''}`}
           style={{ color: config.textColor }}
         >
           {card.title}
@@ -207,7 +207,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
                   )}
                 </button>
                 <span 
-                  className={`text-[16px] font-medium tracking-tight leading-snug transition-all ${checkedItems[idx] ? 'line-through decoration-2 decoration-white/40' : ''}`}
+                  className={`text-[16px] leading-[24px] font-medium tracking-tight transition-all ${checkedItems[idx] ? 'line-through decoration-2 decoration-white/40' : ''}`}
                   style={{ 
                     color: config.textColor,
                     opacity: checkedItems[idx] ? 0.4 : 1,
@@ -279,7 +279,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
 
         {/* Content (No separate title, just big text) */}
         <div 
-          className={`text-[16px] leading-relaxed mb-6 font-medium relative ${!isModal ? 'flex-1 overflow-hidden' : ''}`}
+          className={`text-[16px] leading-[24px] mb-6 font-medium relative ${!isModal ? 'flex-1 overflow-hidden' : ''}`}
           style={{ color: config.textColor }}
         >
           <div className={!isModal ? 'line-clamp-10' : ''}>{card.content}</div>
@@ -330,10 +330,10 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
             </button>
           )}
         </div>
-        <h4 className={`font-semibold text-[22px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
+        <h4 className={`font-semibold text-[18px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
           {card.title}
         </h4>
-        <div className={`space-y-2 text-[16px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
+        <div className={`space-y-2 text-[16px] leading-[24px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
           {card.metadata?.participants && (
             <div><span className="font-semibold">参与者:</span> {card.metadata.participants.join(', ')}</div>
           )}
@@ -380,10 +380,10 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
             </button>
           )}
         </div>
-        <h4 className={`font-semibold text-[22px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
+        <h4 className={`font-semibold text-[18px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
           {card.title}
         </h4>
-        <div className={`space-y-2 text-[16px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
+        <div className={`space-y-2 text-[16px] leading-[24px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
           {card.metadata?.background && (
             <div><span className="font-semibold">背景:</span> <span className="line-clamp-2">{card.metadata.background}</span></div>
           )}
@@ -435,10 +435,10 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
             </button>
           )}
         </div>
-        <h4 className={`font-semibold text-[22px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
+        <h4 className={`font-semibold text-[18px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
           {card.title}
         </h4>
-        <div className={`space-y-2 text-[16px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
+        <div className={`space-y-2 text-[16px] leading-[24px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
           {card.metadata?.assignee && (
             <div><span className="font-semibold">责任人:</span> {card.metadata.assignee}</div>
           )}
@@ -479,10 +479,10 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
             </button>
           )}
         </div>
-        <h4 className={`font-semibold text-[22px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
+        <h4 className={`font-semibold text-[18px] mb-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
           {card.title || card.metadata?.urlTitle || '链接收藏'}
         </h4>
-        <div className={`space-y-2 text-[16px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
+        <div className={`space-y-2 text-[16px] leading-[24px] ${!isModal ? 'overflow-hidden flex-1' : ''}`} style={{ color: config.textColor, opacity: 0.9 }}>
           {card.metadata?.summary && (
             <p className="line-clamp-3 italic">{card.metadata.summary}</p>
           )}
@@ -538,7 +538,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
 
       {/* Title */}
       <h4 
-        className={`font-medium text-[22px] mt-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-3' : ''}`}
+        className={`font-medium text-[18px] mt-2 leading-snug shrink-0 ${!isModal ? 'line-clamp-3' : ''}`}
         style={{ color: config.textColor }}
       >
         {card.title}
@@ -548,7 +548,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
       {(isExpanded || card.content.length < 80) && card.content !== card.title && (
         <div className={`relative mt-2 ${!isModal ? 'flex-1 overflow-hidden' : ''}`}>
           <p 
-            className={`text-[16px] leading-relaxed opacity-80 ${!isModal ? 'line-clamp-10' : ''}`}
+            className={`text-[16px] leading-[24px] opacity-80 ${!isModal ? 'line-clamp-10' : ''}`}
             style={{ color: config.textColor }}
           >
             {card.content}

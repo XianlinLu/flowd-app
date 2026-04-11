@@ -385,11 +385,11 @@ export default function Home() {
         />
       </div>
 
-      {/* Right Side - Chat Panel (响应式自适应宽度) */}
+      {/* Right Side - Chat Panel (固定较窄宽度） */}
       <div 
         className={`transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-[calc(100%-2rem)_calc(100%-2rem)] flex flex-col min-w-0 ${
           isChatOpen 
-            ? 'w-[460px] max-w-[45vw] min-w-[340px] p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 pointer-events-auto' 
+            ? 'w-[360px] flex-shrink-0 p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 pointer-events-auto' 
             : 'w-0 p-0 opacity-0 scale-[0.05] translate-x-12 translate-y-12 pointer-events-none hidden'
         }`}
       >

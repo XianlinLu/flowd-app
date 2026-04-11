@@ -152,6 +152,26 @@ export class FeishuClient {
     return response.data;
   }
 
+  async updateDocumentPermission(documentId: string): Promise<void> {
+    // 开启文档链接共享，设置任何人可阅读或编辑
+    try {
+      // API: PATCH /drive/v1/permissions/{token}/public
+      // type: docx 
+      await this.request(`/drive/v1/permissions/${documentId}/public?type=docx`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          external_access: true, // 开启外部访问
+          security_entity: 'anyone_can_edit', // 任何获得链接的人都可以编辑 (或者 anyone_can_view)
+          share_entity: 'anyone',
+          link_share_entity: 'anyone_editable', // 允许互联网上任何人获得链接后可以编辑
+        }),
+      });
+    } catch (e) {
+      console.warn('Failed to update document public permission:', e);
+      // We don't throw here to avoid failing the whole sync process just because of permission settings
+    }
+  }
+
   async createDocument(title: string, content?: string, folderToken?: string): Promise<FeishuDocument> {
     const body: any = {
       title,
@@ -170,6 +190,9 @@ export class FeishuClient {
     if (content) {
       await this.updateDocumentContent(documentId, content);
     }
+    
+    // 尝试更新文档权限
+    await this.updateDocumentPermission(documentId);
 
     return {
       title,

@@ -1,5 +1,5 @@
 export type CardType = 'decision' | 'todo' | 'question' | 'note' | 'doc' | 'meeting' | 'prd' | 'bug' | 'bookmark';
-export type CardStatus = 'synced' | 'new' | 'updated';
+export type CardStatus = 'synced' | 'new' | 'updated' | 'syncing' | 'sync_failed';
 export type ContentCategory = 'decided' | 'note' | 'todo' | 'open_question' | 'meeting' | 'prd' | 'bug' | 'bookmark';
 
 export interface Card {
@@ -45,6 +45,8 @@ export interface Card {
       size: number;
       url?: string;
     };
+    // 飞书同步文档链接
+    feishuDocUrl?: string;
   };
 }
 

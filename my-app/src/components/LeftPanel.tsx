@@ -328,12 +328,40 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             <div className="h-px bg-gray-200/50 my-1"></div>
             
             <button 
-              onClick={() => {
+              onClick={async () => {
                 if (contextMenu.cardId) {
                   const card = boardStore.getAllCards().find(c => c.id === contextMenu.cardId);
                   if (card) {
-                    boardStore.updateCard(card.id, { status: 'synced' });
-                    alert(`已将卡片同步至飞书项目专属目录。\n类型: ${card.category}\n标题: ${card.title}`);
+                    try {
+                      boardStore.updateCard(card.id, { status: 'syncing' });
+                      const response = await fetch('/api/feishu/sync-card', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          title: card.title,
+                          content: card.content,
+                          category: card.category
+                        })
+                      });
+                      
+                      const data = await response.json();
+                      if (data.success) {
+                        boardStore.updateCard(card.id, { 
+                          status: 'synced',
+                          metadata: {
+                            ...card.metadata,
+                            feishuDocUrl: data.url
+                          }
+                        });
+                        alert(`同步成功！已将卡片同步至飞书。\n文档链接: ${data.url}`);
+                      } else {
+                        boardStore.updateCard(card.id, { status: 'sync_failed' });
+                        alert(`同步失败: ${data.error || '未知错误'}`);
+                      }
+                    } catch (err) {
+                      boardStore.updateCard(card.id, { status: 'sync_failed' });
+                      alert('同步请求失败，请检查网络或控制台日志。');
+                    }
                   }
                 }
                 setContextMenu(null);
@@ -560,9 +588,27 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
 
             <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
               <button 
-                onClick={() => {
-                  alert('已发起同步请求...');
-                  // Simulate sync and close
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/feishu/sync-card', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        title: creationFormData.title,
+                        content: JSON.stringify(creationFormData, null, 2),
+                        category: creationModalType
+                      })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                      alert(`同步成功！已将内容同步至飞书。\n文档链接: ${data.url}`);
+                    } else {
+                      alert(`同步失败: ${data.error || '未知错误'}`);
+                    }
+                  } catch (err) {
+                    alert('同步请求失败，请检查网络或控制台日志。');
+                  }
+                  setCreationModalType(null);
                 }}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
               >
@@ -895,12 +941,40 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
           <div className="h-px bg-gray-200/50 my-1"></div>
           
           <button 
-            onClick={() => {
+            onClick={async () => {
               if (contextMenu.cardId) {
                 const card = boardStore.getAllCards().find(c => c.id === contextMenu.cardId);
                 if (card) {
-                  boardStore.updateCard(card.id, { status: 'synced' });
-                  alert(`已将卡片同步至飞书项目专属目录。\n类型: ${card.category}\n标题: ${card.title}`);
+                  try {
+                    boardStore.updateCard(card.id, { status: 'syncing' });
+                    const response = await fetch('/api/feishu/sync-card', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        title: card.title,
+                        content: card.content,
+                        category: card.category
+                      })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                      boardStore.updateCard(card.id, { 
+                        status: 'synced',
+                        metadata: {
+                          ...card.metadata,
+                          feishuDocUrl: data.url
+                        }
+                      });
+                      alert(`同步成功！已将卡片同步至飞书。\n文档链接: ${data.url}`);
+                    } else {
+                      boardStore.updateCard(card.id, { status: 'sync_failed' });
+                      alert(`同步失败: ${data.error || '未知错误'}`);
+                    }
+                  } catch (err) {
+                    boardStore.updateCard(card.id, { status: 'sync_failed' });
+                    alert('同步请求失败，请检查网络或控制台日志。');
+                  }
                 }
               }
               setContextMenu(null);

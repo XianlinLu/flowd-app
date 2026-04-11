@@ -777,24 +777,27 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             </div>
 
             {/* Cards */}
-            <div className="space-y-3">
+            <div>
               {displayCards.length === 0 ? (
                 <div className="text-center py-8 text-gray-400 text-xs border-2 border-dashed border-gray-200 rounded-xl">
                   <p>暂无卡片</p>
                   <p className="mt-1">在右侧输入想法，AI 会自动归类</p>
                 </div>
               ) : (
-                displayCards.map((card) => (
-                  <DraggableCard
-                    key={card.id}
-                    card={card}
-                    onUpdate={handleUpdateCard}
-                    onDelete={handleDeleteCard}
-                    onChat={handleChatCard}
-                    onClick={(card) => setSelectedCardId(card.id)}
-                    onContextMenu={handleContextMenu}
-                  />
-                ))
+                <div className="columns-2 gap-3">
+                  {displayCards.map((card) => (
+                    <div key={card.id} className="break-inside-avoid">
+                      <DraggableCard
+                        card={card}
+                        onUpdate={handleUpdateCard}
+                        onDelete={handleDeleteCard}
+                        onChat={handleChatCard}
+                        onClick={(card) => setSelectedCardId(card.id)}
+                        onContextMenu={handleContextMenu}
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>

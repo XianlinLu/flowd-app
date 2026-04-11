@@ -1328,7 +1328,7 @@ ${docText}
                   key={btn.id}
                   onClick={() => handleSmartButtonWithCard(btn.id)}
                   disabled={isLoading}
-                  className="px-3 py-1.5 text-[10px] font-medium bg-white/60 hover:bg-white text-gray-600 rounded-full border border-gray-200/50 transition-colors disabled:opacity-50"
+                  className="px-3 py-1.5 text-[16px] font-medium bg-white/60 hover:bg-white text-gray-600 rounded-full border border-gray-200/50 transition-colors disabled:opacity-50"
                 >
                   {btn.label}
                 </button>

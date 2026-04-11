@@ -185,7 +185,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
                 <div className="w-full h-full overflow-hidden rounded-[20px] [&>div]:h-full [&>div]:w-full [&>div]:m-0">
                   <FlowdCard 
                     card={card}
-                    isModal={false}
+                    isModal={true}
                   />
                 </div>
               </div>

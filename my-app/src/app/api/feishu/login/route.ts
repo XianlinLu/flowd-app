@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const redirectUrl = new URL('/api/feishu/callback', request.url);
   const REDIRECT_URI = redirectUrl.toString();
 
-  const feishuAuthUrl = new URL('https://open.feishu.cn/open-apis/authen/v1/user_auth_page_beta');
+  const feishuAuthUrl = new URL('https://open.feishu.cn/open-apis/authen/v1/index');
   
   feishuAuthUrl.searchParams.append('app_id', FEISHU_APP_ID);
   feishuAuthUrl.searchParams.append('redirect_uri', REDIRECT_URI);

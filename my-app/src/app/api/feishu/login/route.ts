@@ -21,6 +21,11 @@ export async function GET(request: Request) {
   feishuAuthUrl.searchParams.append('app_id', FEISHU_APP_ID);
   feishuAuthUrl.searchParams.append('redirect_uri', REDIRECT_URI);
   feishuAuthUrl.searchParams.append('state', 'flowd_login');
+  // 根据飞书官方文档，在 URL 中附加所需权限的 scope
+  // 这里我们需要读写多维表格、文档、云空间，以及获取用户身份信息
+  // 如果还需要其他权限，可以继续在这里追加，多个 scope 之间用空格分隔
+  const scopes = 'bitable:app docx:document drive:drive auth:user.id:read';
+  feishuAuthUrl.searchParams.append('scope', scopes);
 
   return NextResponse.redirect(feishuAuthUrl.toString());
 }

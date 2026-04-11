@@ -1078,6 +1078,18 @@ ${docText}
     setIsDragOver(false);
 
     try {
+      // First check for files
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          alert('文件大小不能超过 5MB ❌');
+          return;
+        }
+        setSelectedFile(file);
+        return; // File handled, exit
+      }
+
+      // Then check for JSON data (cards)
       const data = e.dataTransfer.getData('application/json');
       if (data) {
         const { cardId } = JSON.parse(data);
@@ -1091,7 +1103,7 @@ ${docText}
     } catch (err) {
       console.error('Drop error:', err);
     }
-  }, []);
+  }, [handleCardDrop]);
 
   // Handle smart button click with dropped card context
   const handleSmartButtonWithCard = useCallback(async (buttonId: string) => {

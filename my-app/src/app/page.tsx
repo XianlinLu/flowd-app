@@ -368,8 +368,8 @@ export default function Home() {
         isPetVisible={isPetVisible}
       />
 
-      {/* Left Side - Board Panel */}
-      <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isChatOpen ? 'w-[380px]' : 'flex-1 w-full'}`}>
+      {/* Left Side - Board Panel (占大部分) */}
+      <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isChatOpen ? 'flex-1' : 'flex-1 w-full'}`}>
         <LeftPanel 
           key={`left-${userId}-${currentProjectId}`}
           projectName={currentProject?.name || '新项目'}
@@ -385,15 +385,15 @@ export default function Home() {
         />
       </div>
 
-      {/* Right Side - Chat Panel (占大部分) */}
+      {/* Right Side - Chat Panel (响应式自适应宽度) */}
       <div 
         className={`transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-[calc(100%-2rem)_calc(100%-2rem)] flex flex-col min-w-0 ${
           isChatOpen 
-            ? 'flex-1 p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 w-auto pointer-events-auto' 
+            ? 'w-[460px] max-w-[45vw] min-w-[340px] p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 pointer-events-auto' 
             : 'w-0 p-0 opacity-0 scale-[0.05] translate-x-12 translate-y-12 pointer-events-none hidden'
         }`}
       >
-        <div className={`h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-2xl border border-white/40 ${isChatOpen ? 'min-w-[500px]' : 'min-w-0'}`}>
+        <div className={`h-full w-full bg-[#E6E9EB] rounded-3xl overflow-hidden shadow-2xl border border-white/40`}>
           <ChatPanel 
           key={`chat-${userId}-${currentProjectId}`}
           projectId={currentProjectId}

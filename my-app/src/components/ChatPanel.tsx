@@ -541,6 +541,7 @@ export function ChatPanel({
     // Extract title from first sentence or first 30 chars
     let title = content.split(/[。！？.!?]/)[0].substring(0, 30);
     if (title.length === 30) title += '...';
+    if (!title && file) title = file.name;
     
     // Determine category based on content
     let category: ContentCategory = isDecision ? 'decided' : 'note'; // Default to note for ideas

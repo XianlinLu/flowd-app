@@ -491,6 +491,20 @@ export function ChatPanel({
       /创建[一个种样件]/i,
       /实现[一个种样件]/i,
       /做[一个种样件].*?(?:应用|产品|功能|系统|平台|工具)/i,
+      /我想要/i,
+      /要做/i,
+      /想做/i,
+      /我打算/i,
+      /我计划/i,
+      /我准备/i,
+      /作为灵感/i,
+      /灵感来源/i,
+      /参考/i,
+      /存入左侧/i,
+      /存入看板/i,
+      /保存到左侧/i,
+      /记录下来/i,
+      /记下来/i,
     ];
 
     if (decisionPatterns.some(pattern => pattern.test(text))) {
@@ -505,7 +519,7 @@ export function ChatPanel({
   };
 
   // Auto save user idea to board
-  const autoSaveIdeaToBoard = (content: string): boolean => {
+  const autoSaveIdeaToBoard = (content: string, file: File | null): boolean => {
     // Check if it's asking for tasks first
     if (isAskingForTasks(content)) {
       const newCard = boardStore.addCard('open_question', {
@@ -521,7 +535,8 @@ export function ChatPanel({
     }
 
     const { isMatch, isDecision } = isIdeaOrDecision(content);
-    if (!isMatch) return false;
+    // If it doesn't match idea patterns, but has an image with some descriptive text, we can still save it
+    if (!isMatch && !(file && content.length > 5)) return false;
 
     // Extract title from first sentence or first 30 chars
     let title = content.split(/[。！？.!?]/)[0].substring(0, 30);
@@ -540,7 +555,15 @@ export function ChatPanel({
       content: content,
       metadata: {
         aiGenerated: false,
-        tags: [category === 'decided' ? '决策' : '想法'],
+        tags: [category === 'decided' ? '决策' : (file ? '附件' : '想法')],
+        ...(file ? {
+          attachment: {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            url: URL.createObjectURL(file)
+          }
+        } : {})
       },
     });
 
@@ -634,7 +657,7 @@ export function ChatPanel({
     }
 
     // Auto save idea to board before sending
-    const wasSaved = autoSaveIdeaToBoard(userInput);
+    const wasSaved = autoSaveIdeaToBoard(userInput, selectedFile);
 
     const userMessage: Message = {
       id: `msg_${Date.now()}_user`,

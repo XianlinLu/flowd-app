@@ -745,14 +745,18 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       {/* About Section Standalone Cards */}
       {sections.flatMap(s => s.cards).filter(card => card.metadata?.isAboutFlowd).map((card) => (
         <div key={card.id} className="animate-slide-in mb-6">
-          <DraggableCard
-            card={card}
-            onUpdate={handleUpdateCard}
-            onDelete={handleDeleteCard}
-            onChat={handleChatCard}
-            onClick={(card) => setSelectedCardId(card.id)}
-            onContextMenu={handleContextMenu}
-          />
+          <div className="columns-2 gap-3">
+            <div className="break-inside-avoid">
+              <DraggableCard
+                card={card}
+                onUpdate={handleUpdateCard}
+                onDelete={handleDeleteCard}
+                onChat={handleChatCard}
+                onClick={(card) => setSelectedCardId(card.id)}
+                onContextMenu={handleContextMenu}
+              />
+            </div>
+          </div>
         </div>
       ))}
 

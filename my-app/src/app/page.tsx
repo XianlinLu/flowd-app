@@ -368,8 +368,8 @@ export default function Home() {
         isPetVisible={isPetVisible}
       />
 
-      {/* Left Side - Board Panel (占 45%) */}
-      <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isChatOpen ? 'w-[45%]' : 'flex-1 w-full'}`}>
+      {/* Left Side - Board Panel (占 40%) */}
+      <div className={`flex-shrink-0 bg-[#C1C9CC] overflow-hidden border-l border-gray-300/30 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isChatOpen ? 'w-[40%]' : 'flex-1 w-full'}`}>
         <LeftPanel 
           key={`left-${userId}-${currentProjectId}`}
           projectName={currentProject?.name || '新项目'}
@@ -385,11 +385,11 @@ export default function Home() {
         />
       </div>
 
-      {/* Right Side - Chat Panel (占 55%) */}
+      {/* Right Side - Chat Panel (占 60%) */}
       <div 
         className={`transition-all duration-[600ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-[calc(100%-2rem)_calc(100%-2rem)] flex flex-col min-w-0 ${
           isChatOpen 
-            ? 'w-[55%] p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 pointer-events-auto' 
+            ? 'w-[60%] p-4 pl-0 opacity-100 scale-100 translate-x-0 translate-y-0 pointer-events-auto' 
             : 'w-0 p-0 opacity-0 scale-[0.05] translate-x-12 translate-y-12 pointer-events-none hidden'
         }`}
       >

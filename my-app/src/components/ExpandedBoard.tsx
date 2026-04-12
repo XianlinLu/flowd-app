@@ -147,15 +147,13 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {/* About Flowd Standalone - Always renders if exists, usually counts as 'today' for visibility */}
             {aboutCard && (
               <div 
-                className="w-full h-auto transition-transform hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md rounded-[16px]" 
+                className="w-full h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
                 onClick={() => onCardClick?.(aboutCard)}
               >
-                <div className="w-full h-auto rounded-[16px] [&>div]:w-full [&>div]:m-0">
-                  <FlowdCard 
-                    card={aboutCard}
-                    isModal={false}
-                  />
-                </div>
+                <FlowdCard 
+                  card={aboutCard}
+                  isModal={false}
+                />
               </div>
             )}
             
@@ -163,15 +161,13 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {todayGroups.summaryCards.map(card => (
               <div 
                 key={card.id}
-                className="w-full h-auto transition-transform hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md rounded-[16px]" 
+                className="w-full h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
                 onClick={() => onCardClick?.(card)}
               >
-                <div className="w-full h-auto rounded-[16px] [&>div]:w-full [&>div]:m-0">
-                  <FlowdCard 
-                    card={card}
-                    isModal={false}
-                  />
-                </div>
+                <FlowdCard 
+                  card={card}
+                  isModal={false}
+                />
               </div>
             ))}
 
@@ -232,15 +228,13 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {pastGroups.summaryCards.map(card => (
               <div 
                 key={card.id}
-                className="w-full h-auto transition-transform hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md rounded-[16px]" 
+                className="w-full h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
                 onClick={() => onCardClick?.(card)}
               >
-                <div className="w-full h-auto rounded-[16px] [&>div]:w-full [&>div]:m-0">
-                  <FlowdCard 
-                    card={card}
-                    isModal={false}
-                  />
-                </div>
+                <FlowdCard 
+                  card={card}
+                  isModal={false}
+                />
               </div>
             ))}
 

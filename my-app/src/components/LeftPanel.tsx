@@ -271,7 +271,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                   </svg>
                 </button>
               </div>
-              <div className="w-full max-h-[85vh] overflow-y-auto rounded-[28px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
+              <div className="w-full max-h-[85vh] overflow-y-auto rounded-[16px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
                 <FlowdCard 
                   card={selectedCard}
                   isModal={true}
@@ -893,7 +893,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
               </button>
             </div>
             
-            <div className="w-full max-h-[85vh] overflow-y-auto rounded-[28px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
+            <div className="w-full max-h-[85vh] overflow-y-auto rounded-[16px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
               <FlowdCard 
                 card={selectedCard}
                 isModal={true}

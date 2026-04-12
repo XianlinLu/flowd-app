@@ -56,18 +56,18 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
         </div>
         
         {/* Render stacked cards (up to 3) */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-[220px] h-[160px]">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-[220px]">
           {cardsGroup.slice(0, 3).map((card, idx) => (
             <div 
               key={card.id}
-              className="absolute right-0 top-0 w-full h-full shadow-lg transition-transform duration-300 group-hover:translate-x-[-10px] group-hover:-translate-y-[10px]"
+              className="absolute right-0 top-1/2 -translate-y-1/2 w-full transition-transform duration-300 group-hover:translate-x-[-10px] group-hover:-translate-y-[10px]"
               style={{
                 zIndex: 10 - idx,
                 transform: `translate(${idx * 15}px, ${idx * 10}px) rotate(${idx * 3}deg) scale(${1 - idx * 0.05})`,
                 opacity: 1 - idx * 0.1
               }}
             >
-              <div className="w-full h-full pointer-events-none overflow-hidden rounded-[20px] [&>div]:h-full [&>div]:w-full [&>div]:m-0">
+              <div className="w-full pointer-events-none rounded-[16px] shadow-lg [&>div]:w-full [&>div]:m-0">
                 <FlowdCard 
                   card={card}
                   isModal={false}
@@ -94,10 +94,10 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {/* About Flowd Standalone - Always renders if exists, usually counts as 'today' for visibility */}
             {aboutCard && (
               <div 
-                className="w-full h-[220px] transition-transform hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md rounded-[20px]" 
+                className="w-full h-auto transition-transform hover:scale-[1.02] cursor-pointer shadow-sm hover:shadow-md rounded-[16px]" 
                 onClick={() => onCardClick?.(aboutCard)}
               >
-                <div className="w-full h-full overflow-hidden rounded-[20px] [&>div]:h-full [&>div]:w-full [&>div]:m-0">
+                <div className="w-full h-auto rounded-[16px] [&>div]:w-full [&>div]:m-0">
                   <FlowdCard 
                     card={aboutCard}
                     isModal={false}
@@ -175,14 +175,14 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {activeGroup.cards.map((card, idx) => (
               <div 
                 key={card.id} 
-                className="w-[320px] h-[220px] shrink-0 animate-slide-up hover:scale-105 transition-transform cursor-pointer shadow-xl rounded-[20px]"
+                className="w-[320px] h-auto shrink-0 animate-slide-up hover:scale-105 transition-transform cursor-pointer shadow-xl rounded-[16px]"
                 style={{ animationDelay: `${idx * 50}ms` }}
                 onClick={() => {
                   setActiveGroup(null);
                   onCardClick?.(card);
                 }}
               >
-                <div className="w-full h-full overflow-hidden rounded-[20px] [&>div]:h-full [&>div]:w-full [&>div]:m-0">
+                <div className="w-full h-auto rounded-[16px] [&>div]:w-full [&>div]:m-0">
                   <FlowdCard 
                     card={card}
                     isModal={true}

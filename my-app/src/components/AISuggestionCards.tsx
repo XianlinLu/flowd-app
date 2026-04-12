@@ -68,7 +68,7 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
         return (
           <div
             key={card.id}
-            className="flex-shrink-0 w-[280px] rounded-[24px] p-6 shadow-sm hover:shadow-md transition-shadow snap-start relative overflow-hidden"
+            className="flex-shrink-0 w-[280px] rounded-[16px] p-6 shadow-sm hover:shadow-md transition-shadow snap-start relative overflow-hidden"
             style={{ backgroundColor: style.bg }}
           >
             {/* Background watermark for OPEN QUESTION */}

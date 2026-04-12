@@ -60,10 +60,10 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
           {cardsGroup.slice(0, 3).map((card, idx) => (
             <div 
               key={card.id}
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-full transition-transform duration-300 group-hover:translate-x-[-10px] group-hover:-translate-y-[10px]"
+              className="absolute right-0 top-1/2 -translate-y-1/2 w-full transition-transform duration-300 group-hover:translate-x-[-10px] group-hover:translate-y-[calc(-50%-10px)]"
               style={{
                 zIndex: 10 - idx,
-                transform: `translate(${idx * 15}px, ${idx * 10}px) rotate(${idx * 3}deg) scale(${1 - idx * 0.05})`,
+                transform: `translate(${idx * 15}px, calc(-50% + ${idx * 10}px)) rotate(${idx * 3}deg) scale(${1 - idx * 0.05})`,
                 opacity: 1 - idx * 0.1
               }}
             >

@@ -44,7 +44,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
     
     return (
       <div 
-        className={`relative w-full h-[220px] rounded-3xl p-6 ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}
+        className={`relative w-full min-h-[280px] rounded-3xl p-6 ${colorClass} transition-transform hover:scale-[1.02] cursor-pointer group`}
         onClick={() => setActiveGroup({ title, cards: cardsGroup })}
       >
         <div className="absolute top-6 left-6 z-20">
@@ -56,7 +56,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
         </div>
         
         {/* Render stacked cards (up to 3) */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-[220px]">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-[240px]">
           {cardsGroup.slice(0, 3).map((card, idx) => (
             <div 
               key={card.id}

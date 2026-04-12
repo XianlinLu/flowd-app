@@ -56,25 +56,46 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
         </div>
         
         {/* Render stacked cards (up to 3) */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-[240px]">
-          {cardsGroup.slice(0, 3).map((card, idx) => (
-            <div 
-              key={card.id}
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-full transition-transform duration-300 group-hover:translate-x-[-10px] group-hover:translate-y-[calc(-50%-10px)]"
-              style={{
-                zIndex: 10 - idx,
-                transform: `translate(${idx * 15}px, calc(-50% + ${idx * 10}px)) rotate(${idx * 3}deg) scale(${1 - idx * 0.05})`,
-                opacity: 1 - idx * 0.1
-              }}
-            >
-              <div className="w-full pointer-events-none rounded-[16px] shadow-lg [&>div]:w-full [&>div]:m-0">
-                <FlowdCard 
-                  card={card}
-                  isModal={false}
-                />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-[240px] h-[240px] perspective-1000">
+          {cardsGroup.slice(0, 3).map((card, idx) => {
+            // Base transformations (tightly packed, inside the container)
+            const baseTranslateX = idx * 6;
+            const baseTranslateY = idx * 6;
+            const baseRotate = idx * 2;
+            const baseScale = 1 - idx * 0.05;
+            
+            // Hover transformations (fanned out, slightly moved up)
+            const hoverTranslateX = idx * 16;
+            const hoverTranslateY = -2 + (idx * 4); // Overall -2px up, plus a slight offset per card
+            const hoverRotate = idx * 5;
+            
+            return (
+              <div 
+                key={card.id}
+                className="absolute inset-0 w-full h-full transition-all duration-300 ease-out origin-bottom-right"
+                style={{
+                  zIndex: 10 - idx,
+                  transform: `translate3d(${baseTranslateX}px, ${baseTranslateY}px, 0) rotate(${baseRotate}deg) scale(${baseScale})`,
+                  opacity: 1 - idx * 0.1
+                }}
+              >
+                {/* This inner div receives the group-hover effects via Tailwind arbitrary values */}
+                <div 
+                  className="w-full h-full pointer-events-none rounded-[16px] shadow-lg transition-transform duration-300 ease-out group-hover:[transform:translate3d(var(--hover-tx),var(--hover-ty),0)_rotate(var(--hover-rot))] [&>div]:w-full [&>div]:h-full [&>div]:m-0"
+                  style={{
+                    '--hover-tx': `${hoverTranslateX - baseTranslateX}px`,
+                    '--hover-ty': `${hoverTranslateY - baseTranslateY}px`,
+                    '--hover-rot': `${hoverRotate - baseRotate}deg`,
+                  } as React.CSSProperties}
+                >
+                  <FlowdCard 
+                    card={card}
+                    isModal={false}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );

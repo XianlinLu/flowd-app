@@ -79,9 +79,27 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
 
   const handleContextMenu = useCallback((e: React.MouseEvent, cardId?: string) => {
     e.preventDefault();
+    
+    // Estimate menu dimensions
+    const MENU_WIDTH = 192; // w-48 is 12rem = 192px
+    const MENU_HEIGHT = 450; // Approximate height for 11 items + paddings
+    
+    let x = e.clientX;
+    let y = e.clientY;
+    
+    // Check horizontal boundaries
+    if (x + MENU_WIDTH > window.innerWidth) {
+      x = window.innerWidth - MENU_WIDTH - 16;
+    }
+    
+    // Check vertical boundaries - if not enough space below, open upwards
+    if (y + MENU_HEIGHT > window.innerHeight) {
+      y = Math.max(16, y - MENU_HEIGHT);
+    }
+
     setContextMenu({
-      x: e.clientX,
-      y: e.clientY,
+      x,
+      y,
       cardId,
     });
   }, []);

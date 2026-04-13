@@ -881,7 +881,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
             onClick={() => setSelectedCardId(null)}
           />
-          <div className="relative w-full max-w-2xl max-h-[85vh] animate-scale-in flex flex-col">
+          <div className="relative w-full max-w-[340px] max-h-[85vh] animate-scale-in flex flex-col">
             <div className="absolute -top-14 right-0 z-50">
               <button
                 onClick={() => setSelectedCardId(null)}

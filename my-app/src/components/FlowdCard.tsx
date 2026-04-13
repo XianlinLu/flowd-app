@@ -67,7 +67,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
   if (card.category === 'open_question') {
     return (
       <div 
-        className={`card-question p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] overflow-hidden flex flex-col ${!isModal ? 'h-[240px]' : ''}`}
+        className={`card-question p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] flex flex-col ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
         onClick={() => onClick?.(card)}
         style={{ backgroundColor: '#E3FF96' }}
       >
@@ -143,7 +143,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
     
     return (
       <div 
-        className={`card-todo p-6 ${!isModal ? 'mb-3 h-[240px]' : ''} cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] overflow-hidden flex flex-col`}
+        className={`card-todo p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] flex flex-col ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
         onClick={() => onClick?.(card)}
         style={{ backgroundColor: '#134e4a' }} // Using the specific dark teal color from the image
       >
@@ -252,7 +252,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
   if (card.category === 'decided') {
     return (
       <div 
-        className={`card-decided p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] overflow-hidden flex flex-col ${!isModal ? 'h-[240px]' : ''}`}
+        className={`card-decided p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] flex flex-col ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
         onClick={() => onClick?.(card)}
       >
         {/* Header */}
@@ -303,7 +303,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
   if (card.category === 'meeting') {
     return (
       <div 
-        className={`card-meeting p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] overflow-hidden flex flex-col ${!isModal ? 'h-[240px]' : ''}`}
+        className={`card-meeting p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] flex flex-col ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
         onClick={() => onClick?.(card)}
         style={{ backgroundColor: config.bgColor, borderColor: config.borderColor, borderWidth: 1 }}
       >
@@ -353,7 +353,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
   if (card.category === 'prd') {
     return (
       <div 
-        className={`card-prd p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] overflow-hidden flex flex-col ${!isModal ? 'h-[240px]' : ''}`}
+        className={`card-prd p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] flex flex-col ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
         onClick={() => onClick?.(card)}
         style={{ backgroundColor: config.bgColor, borderColor: config.borderColor, borderWidth: 1 }}
       >
@@ -403,7 +403,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
   if (card.category === 'bug') {
     return (
       <div 
-        className={`card-bug p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] overflow-hidden flex flex-col ${!isModal ? 'h-[240px]' : ''}`}
+        className={`card-bug p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] flex flex-col ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
         onClick={() => onClick?.(card)}
         style={{ backgroundColor: config.bgColor, borderColor: config.borderColor, borderWidth: 1 }}
       >
@@ -452,7 +452,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
   if (card.category === 'bookmark') {
     return (
       <div 
-        className={`card-bookmark p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] overflow-hidden flex flex-col ${!isModal ? 'h-[240px]' : ''}`}
+        className={`card-bookmark p-6 mb-3 cursor-default hover:shadow-lg transition-all duration-200 group animate-fade-in relative rounded-[16px] flex flex-col ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
         onClick={() => onClick?.(card)}
         style={{ backgroundColor: config.bgColor, borderColor: config.borderColor, borderWidth: 1 }}
       >
@@ -500,7 +500,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
 
   return (
     <div
-      className={`card-note mb-3 cursor-pointer hover:shadow-lg transition-all duration-200 group animate-fade-in relative overflow-hidden flex flex-col rounded-[16px] ${!isModal ? 'h-[240px]' : ''}`}
+      className={`card-note mb-3 cursor-pointer hover:shadow-lg transition-all duration-200 group animate-fade-in relative flex flex-col rounded-[16px] ${!isModal ? 'h-[240px] overflow-hidden' : 'overflow-y-auto'}`}
       onClick={() => onClick ? onClick(card) : setIsExpanded(!isExpanded)}
       style={{ backgroundColor: config.bgColor }}
     >

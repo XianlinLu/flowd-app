@@ -260,7 +260,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
               className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
               onClick={() => setSelectedCardId(null)}
             />
-            <div className="relative w-full max-w-[340px] animate-scale-in flex flex-col">
+            <div className="relative w-full max-w-[340px] max-h-[70vh] animate-scale-in flex flex-col">
               <div className="absolute -top-14 right-0 z-50">
                 <button
                   onClick={() => setSelectedCardId(null)}
@@ -271,7 +271,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                   </svg>
                 </button>
               </div>
-              <div className="w-full max-h-[85vh] overflow-y-auto rounded-[16px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
+              <div className="w-full max-h-[70vh] overflow-y-auto rounded-[16px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
                 <FlowdCard 
                   card={selectedCard}
                   isModal={true}
@@ -881,7 +881,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
             onClick={() => setSelectedCardId(null)}
           />
-          <div className="relative w-full max-w-[340px] max-h-[85vh] animate-scale-in flex flex-col">
+          <div className="relative w-full max-w-[340px] max-h-[70vh] animate-scale-in flex flex-col">
             <div className="absolute -top-14 right-0 z-50">
               <button
                 onClick={() => setSelectedCardId(null)}
@@ -893,7 +893,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
               </button>
             </div>
             
-            <div className="w-full max-h-[85vh] overflow-y-auto rounded-[16px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
+            <div className="w-full max-h-[70vh] overflow-y-auto rounded-[16px] drop-shadow-2xl flex flex-col bg-transparent [&>div]:!m-0 [&>div]:!shadow-none">
               <FlowdCard 
                 card={selectedCard}
                 isModal={true}

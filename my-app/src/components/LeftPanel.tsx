@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { BoardSection, Card, ContentCategory } from '@/types/board';
 import { boardStore } from '@/lib/board-store';
+import { toast } from '@/lib/toast';
 import { DraggableCard } from './DraggableCard';
 import { FlowdCard } from './FlowdCard';
 import { ExpandedBoard } from './ExpandedBoard';
@@ -315,19 +316,19 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
               创建待办
             </button>
             <button onClick={handleCreateMeeting} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <span className="text-base w-4 text-center">👥</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
               创建会议记录
             </button>
             <button onClick={handleCreatePRD} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <span className="text-base w-4 text-center">📋</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
               创建PRD文档
             </button>
             <button onClick={handleCreateBug} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <span className="text-base w-4 text-center">🐛</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
               创建Bug记录
             </button>
             <button onClick={handleCreateBookmark} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <span className="text-base w-4 text-center">🔗</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
               创建链接收藏
             </button>
             <button onClick={handleCreateAboutFlowd} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
@@ -339,7 +340,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
               收拢并总结项目
             </button>
             <button onClick={() => { onToggleFullScreen?.(); setContextMenu(null); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <span className="text-base w-4 text-center">🖥️</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               全屏聚焦模式
             </button>
             
@@ -371,14 +372,14 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                             feishuDocUrl: data.url
                           }
                         });
-                        alert(`同步成功！已将卡片同步至飞书。\n文档链接: ${data.url}`);
+                        toast.success('同步成功！已将卡片同步至飞书');
                       } else {
                         const errorMsg = data.details || data.error || '未知错误';
                         boardStore.updateCard(card.id, { 
                           status: 'sync_failed',
                           metadata: { ...card.metadata, syncError: errorMsg }
                         });
-                        alert(`同步失败: ${errorMsg}`);
+                        toast.error(`同步失败: ${errorMsg}`);
                       }
                     } catch (err: any) {
                       const errorMsg = err.message || '网络或服务器错误';
@@ -386,7 +387,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                         status: 'sync_failed',
                         metadata: { ...card.metadata, syncError: errorMsg }
                       });
-                      alert(`同步请求失败: ${errorMsg}`);
+                      toast.error(`同步请求失败: ${errorMsg}`);
                     }
                   }
                 }
@@ -395,7 +396,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
               disabled={!contextMenu.cardId}
               className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${contextMenu.cardId ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-300 cursor-not-allowed'}`}
             >
-              <span className="w-4 text-center">🔄</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
               同步至飞书
             </button>
 
@@ -627,18 +628,18 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                     });
                     const data = await response.json();
                     if (data.success) {
-                      alert(`同步成功！已将内容同步至飞书。\n文档链接: ${data.url}`);
+                      toast.success('同步成功！已将内容同步至飞书');
                     } else {
-                      alert(`同步失败: ${data.error || '未知错误'}`);
+                      toast.error(`同步失败: ${data.error || '未知错误'}`);
                     }
                   } catch (err) {
-                    alert('同步请求失败，请检查网络或控制台日志。');
+                    toast.error('同步请求失败，请检查网络或控制台日志。');
                   }
                   setCreationModalType(null);
                 }}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
               >
-                <span className="text-base">🔄</span> 同步至飞书
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> 同步至飞书
               </button>
               
               <div className="flex gap-3">
@@ -936,19 +937,19 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             创建待办
           </button>
           <button onClick={handleCreateMeeting} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-            <span className="text-base w-4 text-center">👥</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             创建会议记录
           </button>
           <button onClick={handleCreatePRD} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-            <span className="text-base w-4 text-center">📋</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             创建PRD文档
           </button>
           <button onClick={handleCreateBug} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-            <span className="text-base w-4 text-center">🐛</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             创建Bug记录
           </button>
           <button onClick={handleCreateBookmark} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-            <span className="text-base w-4 text-center">🔗</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
             创建链接收藏
           </button>
           <button onClick={handleCreateAboutFlowd} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
@@ -960,65 +961,65 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             收拢并总结项目
           </button>
           <button onClick={() => { onToggleFullScreen?.(); setContextMenu(null); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-            <span className="text-base w-4 text-center">🖥️</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
             全屏聚焦模式
           </button>
           
           <div className="h-px bg-gray-200/50 my-1"></div>
           
           <button 
-            onClick={async () => {
-              if (contextMenu.cardId) {
-                const card = boardStore.getAllCards().find(c => c.id === contextMenu.cardId);
-                if (card) {
-                  try {
-                    boardStore.updateCard(card.id, { status: 'syncing' });
-                    const response = await fetch('/api/feishu/sync-card', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        title: card.title,
-                        content: card.content,
-                        category: card.category
-                      })
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                      boardStore.updateCard(card.id, { 
-                        status: 'synced',
-                        metadata: {
-                          ...card.metadata,
-                          feishuDocUrl: data.url
-                        }
+              onClick={async () => {
+                if (contextMenu.cardId) {
+                  const card = boardStore.getAllCards().find(c => c.id === contextMenu.cardId);
+                  if (card) {
+                    try {
+                      boardStore.updateCard(card.id, { status: 'syncing' });
+                      const response = await fetch('/api/feishu/sync-card', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          title: card.title,
+                          content: card.content,
+                          category: card.category
+                        })
                       });
-                      alert(`同步成功！已将卡片同步至飞书。\n文档链接: ${data.url}`);
-                    } else {
-                      const errorMsg = data.details || data.error || '未知错误';
+                      
+                      const data = await response.json();
+                      if (data.success) {
+                        boardStore.updateCard(card.id, { 
+                          status: 'synced',
+                          metadata: {
+                            ...card.metadata,
+                            feishuDocUrl: data.url
+                          }
+                        });
+                        toast.success('同步成功！已将卡片同步至飞书');
+                      } else {
+                        const errorMsg = data.details || data.error || '未知错误';
+                        boardStore.updateCard(card.id, { 
+                          status: 'sync_failed',
+                          metadata: { ...card.metadata, syncError: errorMsg }
+                        });
+                        toast.error(`同步失败: ${errorMsg}`);
+                      }
+                    } catch (err: any) {
+                      const errorMsg = err.message || '网络或服务器错误';
                       boardStore.updateCard(card.id, { 
                         status: 'sync_failed',
                         metadata: { ...card.metadata, syncError: errorMsg }
                       });
-                      alert(`同步失败: ${errorMsg}`);
+                      toast.error(`同步请求失败: ${errorMsg}`);
                     }
-                  } catch (err: any) {
-                    const errorMsg = err.message || '网络或服务器错误';
-                    boardStore.updateCard(card.id, { 
-                      status: 'sync_failed',
-                      metadata: { ...card.metadata, syncError: errorMsg }
-                    });
-                    alert(`同步请求失败: ${errorMsg}`);
                   }
                 }
-              }
-              setContextMenu(null);
-            }}
-            disabled={!contextMenu.cardId}
-            className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${contextMenu.cardId ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-300 cursor-not-allowed'}`}
-          >
-            <span className="w-4 text-center">🔄</span>
-            同步至飞书
-          </button>
+                setContextMenu(null);
+              }}
+              disabled={!contextMenu.cardId}
+              className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${contextMenu.cardId ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-300 cursor-not-allowed'}`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              同步至飞书
+            </button>
 
           <button 
             onClick={handleArchive} 
@@ -1409,12 +1410,12 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
               <button 
                 onClick={() => {
-                  alert('已发起同步请求...');
+                  toast.info('已发起同步请求...');
                   // Simulate sync and close
                 }}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
               >
-                <span className="text-base">🔄</span> 同步至飞书
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> 同步至飞书
               </button>
               
               <div className="flex gap-3">

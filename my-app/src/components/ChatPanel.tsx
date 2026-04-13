@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Message } from '@/types/chat';
 import { AISuggestion, ContentCategory, Card } from '@/types/board';
 import { boardStore } from '@/lib/board-store';
+import { toast } from '@/lib/toast';
 import { FLOWD_SYSTEM_PROMPT } from '@/lib/prompts';
 import { DragContext, extractNewCardsFromResponse } from '@/lib/drag-context';
 import { DropZone } from './DropZone';
@@ -162,7 +163,7 @@ export function ChatPanel({
 
     // 5MB limit
     if (file.size > 5 * 1024 * 1024) {
-      alert('文件大小不能超过 5MB ❌');
+      toast.error('文件大小不能超过 5MB ❌');
       e.target.value = '';
       return;
     }
@@ -1127,9 +1128,9 @@ ${docText}
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         const file = e.dataTransfer.files[0];
         if (file.size > 5 * 1024 * 1024) {
-          alert('文件大小不能超过 5MB ❌');
-          return;
-        }
+        toast.error('文件大小不能超过 5MB ❌');
+        return;
+      }
         setSelectedFile(file);
         return; // File handled, exit
       }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from '@/lib/toast';
 
 interface FeishuSyncProps {
   cardCount: number;
@@ -20,7 +21,7 @@ export function FeishuSync({ cardCount }: FeishuSyncProps) {
 
   const handleSync = async () => {
     if (!config.appId || !config.appSecret) {
-      alert('请输入 App ID 和 App Secret');
+      toast.error('请输入 App ID 和 App Secret');
       return;
     }
 

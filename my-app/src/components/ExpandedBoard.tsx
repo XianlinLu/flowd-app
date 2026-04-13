@@ -147,7 +147,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {/* About Flowd Standalone - Always renders if exists, usually counts as 'today' for visibility */}
             {aboutCard && (
               <div 
-                className="w-full h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
+                className="w-full max-w-[600px] h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
                 onClick={() => onCardClick?.(aboutCard)}
               >
                 <FlowdCard 
@@ -161,7 +161,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {todayGroups.summaryCards.map(card => (
               <div 
                 key={card.id}
-                className="w-full h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
+                className="w-full max-w-[600px] h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
                 onClick={() => onCardClick?.(card)}
               >
                 <FlowdCard 
@@ -228,7 +228,7 @@ export function ExpandedBoard({ cards, onCardUpdate, onCardDelete, onCardChat, o
             {pastGroups.summaryCards.map(card => (
               <div 
                 key={card.id}
-                className="w-full h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
+                className="w-full max-w-[600px] h-[280px] transition-transform hover:scale-[1.02] cursor-pointer [&>div]:!h-full [&>div]:!m-0 [&>div]:!max-h-none" 
                 onClick={() => onCardClick?.(card)}
               >
                 <FlowdCard 

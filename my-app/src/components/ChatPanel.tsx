@@ -113,7 +113,34 @@ export function ChatPanel({
       try {
         const stored = localStorage.getItem(getChatStorageKey());
         if (stored) {
-          return JSON.parse(stored);
+          let parsedMessages: Message[] = JSON.parse(stored);
+          
+          // Cleanup legacy permanent "已保存" messages generated before the fix
+          // and ensure any existing notify messages are checked against the board state
+          const allCards = boardStore.getAllCards();
+          const activeSourceIds = new Set<string>();
+          allCards.forEach(c => {
+            if (c.sourceMessageId) {
+              activeSourceIds.add(c.sourceMessageId);
+            }
+          });
+
+          parsedMessages = parsedMessages.filter(msg => {
+            if (msg.role === 'assistant' && msg.content.startsWith('✅ 已保存至左侧看板')) {
+              // Legacy format: `msg_${Date.now()}_notify`, New format: `notify_${sourceMessageId}`
+              if (msg.id.startsWith('notify_')) {
+                const sourceId = msg.id.replace('notify_', '');
+                return activeSourceIds.has(sourceId);
+              } else {
+                // If it's a legacy message without a clear link, just remove it to clean up the bug.
+                // It won't hurt because the green checkmark below the AI message still shows if it's saved.
+                return false; 
+              }
+            }
+            return true;
+          });
+
+          return parsedMessages;
         }
       } catch (e) {
         console.error('Failed to load messages from localStorage', e);

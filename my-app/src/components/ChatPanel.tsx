@@ -149,6 +149,24 @@ export function ChatPanel({
   const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Sync savedMessageIds with boardStore
+  useEffect(() => {
+    const syncSavedMessages = () => {
+      const allCards = boardStore.getAllCards();
+      const ids = new Set<string>();
+      allCards.forEach(c => {
+        if (c.sourceMessageId) {
+          ids.add(c.sourceMessageId);
+        }
+      });
+      setSavedMessageIds(ids);
+    };
+    
+    syncSavedMessages();
+    const unsubscribe = boardStore.subscribe(syncSavedMessages);
+    return () => { unsubscribe(); };
+  }, []);
+
   // State for Pet Emotion
   const [petState, setPetState] = useState<'normal' | 'thinking' | 'smile' | 'happy' | 'see'>('normal');
   const [isPetProfileOpen, setIsPetProfileOpen] = useState(false);
@@ -324,13 +342,13 @@ export function ChatPanel({
     const newCard = boardStore.addCard(category, {
       title: title || 'AI 建议',
       content: message.content,
+      sourceMessageId: message.id,
       metadata: {
         aiGenerated: true,
       },
     });
 
     if (newCard) {
-      setSavedMessageIds(prev => new Set(prev).add(message.id));
       onCardsGenerated?.(1);
       
       // Add notification message
@@ -423,6 +441,7 @@ export function ChatPanel({
           const newCard = boardStore.addCard(cardData.category, {
             title: cardData.title,
             content: cardData.content,
+            sourceMessageId: agentMessage.id,
             metadata: {
               tags: cardData.tags,
               aiGenerated: true,
@@ -898,6 +917,7 @@ export function ChatPanel({
           const newCard = boardStore.addCard(cardData.category, {
             title: cardData.title,
             content: cardData.content,
+            sourceMessageId: agentMessage.id,
             metadata: {
               tags: cardData.tags,
               aiGenerated: true,

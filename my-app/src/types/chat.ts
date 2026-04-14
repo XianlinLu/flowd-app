@@ -13,6 +13,7 @@ export interface Message {
     size: number;
     url?: string;
   };
+  isTemporary?: boolean; // For messages that should disappear automatically
 }
 
 export interface ChatRequest {

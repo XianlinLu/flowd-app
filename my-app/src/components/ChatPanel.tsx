@@ -154,12 +154,66 @@ export function ChatPanel({
     const syncSavedMessages = () => {
       const allCards = boardStore.getAllCards();
       const ids = new Set<string>();
+      
+      // Keep track of card info for deletion notification
+      const cardInfoMap = new Map<string, { title: string; categoryName: string }>();
+      
+      const categoryNames: Record<ContentCategory, string> = {
+        'decided': '已决策',
+        'todo': '待办',
+        'open_question': '待解决问题',
+        'note': '笔记',
+        'meeting': '会议记录',
+        'prd': 'PRD需求文档',
+        'bug': '问题记录',
+        'bookmark': '链接收藏'
+      };
+
       allCards.forEach(c => {
         if (c.sourceMessageId) {
           ids.add(c.sourceMessageId);
+          cardInfoMap.set(c.sourceMessageId, {
+            title: c.title,
+            categoryName: categoryNames[c.category] || '卡片'
+          });
         }
       });
-      setSavedMessageIds(ids);
+      
+      setSavedMessageIds(prev => {
+        // Find ids that were removed
+        const removedIds = [...prev].filter(id => !ids.has(id));
+        
+        if (removedIds.length > 0) {
+          // Remove their corresponding notify messages
+          setMessages(msgs => {
+            let nextMsgs = msgs.filter(m => !removedIds.some(id => m.id === `notify_${id}`));
+            
+            // Add temporary archive message for each removed card
+              removedIds.forEach(id => {
+                const tempMsgId = `temp_archive_${id}_${Date.now()}`;
+                const cardInfo = cardInfoMap.get(id);
+                const categoryName = cardInfo ? cardInfo.categoryName : '卡片';
+                
+                nextMsgs = [...nextMsgs, {
+                  id: tempMsgId,
+                  role: 'assistant',
+                  content: `归档提示：${categoryName}已从左侧看板中归档`,
+                  timestamp: Date.now(),
+                  isTemporary: true
+                }];
+                
+                // Remove the temporary message after 3 seconds
+                setTimeout(() => {
+                  setMessages(currentMsgs => currentMsgs.filter(m => m.id !== tempMsgId));
+                }, 3000);
+              });
+            
+            return nextMsgs;
+          });
+        }
+        
+        return ids;
+      });
     };
     
     syncSavedMessages();
@@ -363,7 +417,7 @@ export function ChatPanel({
         'bookmark': '链接收藏'
       };
       const notifyMessage: Message = {
-        id: `msg_${Date.now()}_notify`,
+        id: `notify_${message.id}`,
         role: 'assistant',
         content: `✅ 已保存至左侧看板 - ${categoryNames[category]}`,
         timestamp: Date.now(),
@@ -1356,7 +1410,7 @@ ${docText}
                       </div>
                     )}
                     {/* Save to board button for AI messages */}
-                    {message.role === 'assistant' && !savedMessageIds.has(message.id) && !message.content.startsWith('✅') && (
+                    {message.role === 'assistant' && !savedMessageIds.has(message.id) && !message.content.startsWith('✅') && !message.isTemporary && (
                       <button
                         onClick={() => handleSaveToBoard(message)}
                         className="mt-2 flex items-center gap-1.5 text-[14px] text-[#9EA8B0] font-medium px-4 py-1.5 rounded-full border-2 border-dashed border-[#9EA8B0] hover:bg-[#9EA8B0]/10 hover:text-[#7E898E] hover:border-[#7E898E] transition-all"
@@ -1365,7 +1419,7 @@ ${docText}
                         保存至左侧看板
                       </button>
                     )}
-                    {message.role === 'assistant' && savedMessageIds.has(message.id) && (
+                    {message.role === 'assistant' && savedMessageIds.has(message.id) && !message.isTemporary && (
                       <div className="mt-2 flex items-center gap-1 text-[10px] text-green-600">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

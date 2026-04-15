@@ -20,6 +20,7 @@ export default function Home() {
   // Sidebar and Project State
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFullScreenMode, setIsFullScreenMode] = useState(false);
+  const [showFullScreenHint, setShowFullScreenHint] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentProjectId, setCurrentProjectId] = useState('1');
@@ -42,6 +43,18 @@ export default function Home() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullScreenMode]);
+
+  useEffect(() => {
+    if (isFullScreenMode) {
+      setShowFullScreenHint(true);
+      const timer = setTimeout(() => {
+        setShowFullScreenHint(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowFullScreenHint(false);
+    }
   }, [isFullScreenMode]);
 
   useEffect(() => {
@@ -346,7 +359,7 @@ export default function Home() {
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-[#C1C9CC]">
       {/* Full Screen Mode Hint */}
-      {isFullScreenMode && (
+      {showFullScreenHint && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] bg-[#5C5C5C] text-white/90 backdrop-blur-md px-5 py-2.5 rounded-full text-[13px] font-medium animate-fade-in flex items-center gap-2.5 shadow-xl border border-white/10 pointer-events-auto transition-all">
           <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6zm4 4h2v2H7V10zm4 0h2v2h-2V10zm4 0h2v2h-2V10zm-8 4h10v2H7v-2z" /></svg> 
           按 <kbd className="px-2 py-0.5 bg-white/20 rounded text-xs mx-0.5 font-mono">ESC</kbd> 退出全屏模式

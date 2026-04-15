@@ -113,9 +113,9 @@ export function ProjectSidebar({
         }`}
       >
         {isOpen ? (
-          <div className="p-6 flex-1 flex flex-col min-w-[260px] opacity-100 transition-opacity duration-300">
+          <div className="p-6 flex-1 min-h-0 flex flex-col min-w-[260px] opacity-100 transition-opacity duration-300">
             {/* Header */}
-            <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center justify-between mb-10 shrink-0">
               <span className="text-[13px] font-medium tracking-[0.25em] text-gray-700">FLOWD</span>
               <button onClick={onToggle} className="text-gray-400 hover:text-gray-700 transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,12 +125,12 @@ export function ProjectSidebar({
             </div>
 
             {/* Subheader */}
-            <div className="text-[10px] font-semibold tracking-[0.2em] text-gray-400 mb-4 ml-1">
+            <div className="text-[10px] font-semibold tracking-[0.2em] text-gray-400 mb-4 ml-1 shrink-0">
               项目名称
             </div>
             
             {/* Projects List */}
-            <div className="flex-1 overflow-y-auto space-y-1 -mx-3 no-scrollbar" ref={menuRef}>
+            <div className="flex-1 overflow-y-auto space-y-1 -mx-3 pr-2" ref={menuRef}>
               {projects.map(project => (
                 <div key={project.id} className="relative group">
                   <button
@@ -242,18 +242,18 @@ export function ProjectSidebar({
             {/* Projects list end */}
           </div>
         ) : (
-          <div className="py-6 flex-1 flex flex-col items-center w-[68px] opacity-100 transition-opacity duration-300">
-            <button onClick={onToggle} className="text-gray-400 hover:text-gray-700 transition-colors mb-6 mt-1 flex justify-center w-full">
+          <div className="py-6 flex-1 min-h-0 flex flex-col items-center w-[68px] opacity-100 transition-opacity duration-300">
+            <button onClick={onToggle} className="text-gray-400 hover:text-gray-700 transition-colors mb-6 mt-1 flex justify-center w-full shrink-0">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
             
-            <div className="text-[10px] font-medium tracking-[0.2em] text-[#9EA8B0] mb-8">
+            <div className="text-[10px] font-medium tracking-[0.2em] text-[#9EA8B0] mb-8 shrink-0">
               FLOWD
             </div>
 
-            <div className="flex-1 flex flex-col items-center space-y-4 w-full overflow-y-auto no-scrollbar">
+            <div className="flex-1 flex flex-col items-center space-y-4 w-full overflow-y-auto pb-4">
               {projects.map(project => (
                 <button
                   key={project.id}

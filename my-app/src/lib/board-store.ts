@@ -60,6 +60,10 @@ class BoardStore {
     }
   }
 
+  getCurrentProjectId() {
+    return this.currentProjectId;
+  }
+
   private getStorageKey() {
     const userPrefix = this.currentUserId ? `${this.currentUserId}_` : '';
     return this.currentProjectId ? `flowd_board_${userPrefix}${this.currentProjectId}` : `flowd_board_${userPrefix}default`;

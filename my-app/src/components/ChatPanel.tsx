@@ -179,6 +179,11 @@ export function ChatPanel({
   // Sync savedMessageIds with boardStore
   useEffect(() => {
     const syncSavedMessages = () => {
+      // Prevent syncing old project cards when ChatPanel mounts before boardStore updates
+      if (boardStore.getCurrentProjectId() !== projectId) {
+        return;
+      }
+
       const allCards = boardStore.getAllCards();
       const ids = new Set<string>();
       

@@ -480,7 +480,8 @@ export function ProjectSidebar({
                   }
                 }}
                 disabled={isBinding}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white disabled:opacity-50 rounded-lg transition-colors"
+                style={{ backgroundColor: '#2C2F34' }}
               >
                 {isBinding ? '保存中...' : '保存绑定'}
               </button>

@@ -40,7 +40,7 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
     switch (category) {
       case 'todo':
         return {
-          bg: '#1a3a3a', // Darker teal matching design
+          bg: '#134e4a', // Darker teal matching design
           text: '#ffffff',
           label: 'TODO',
         };
@@ -68,7 +68,7 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
         return (
           <div
             key={card.id}
-            className="flex-shrink-0 w-[280px] rounded-[16px] p-6 shadow-sm hover:shadow-md transition-shadow snap-start relative overflow-hidden"
+            className="flex-shrink-0 w-[280px] rounded-[16px] p-6 shadow-sm hover:shadow-md transition-shadow snap-start relative overflow-hidden flex flex-col"
             style={{ backgroundColor: style.bg }}
           >
             {/* Background watermark for OPEN QUESTION */}
@@ -91,7 +91,7 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
 
             {/* Title */}
             <h4
-              className="font-bold text-xl mb-4 leading-snug tracking-tight"
+              className="font-semibold text-[18px] mb-8 leading-snug tracking-tight shrink-0"
               style={{ color: style.text }}
             >
               {card.title}
@@ -99,16 +99,19 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
 
             {/* Items List (for TODO) */}
             {card.items && card.items.length > 0 && (
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-5 mb-2 relative flex-1">
                 {card.items.map((item, idx) => (
                   <li
                     key={idx}
-                    className="flex items-start gap-3"
+                    className="flex items-start gap-4"
                   >
-                    <div className="mt-1 w-3.5 h-3.5 border rounded-sm flex-shrink-0" style={{ borderColor: style.text, opacity: 0.7 }} />
+                    <div 
+                      className="mt-[2px] w-[24px] h-[24px] rounded-[6px] border-[2px] flex items-center justify-center flex-shrink-0 relative"
+                      style={{ borderColor: 'rgba(255,255,255,0.9)', backgroundColor: 'transparent' }} 
+                    />
                     <span 
-                      className="text-[15px] font-medium tracking-tight leading-snug"
-                      style={{ color: style.text, opacity: 0.95 }}
+                      className="text-[16px] leading-[24px] font-medium tracking-tight"
+                      style={{ color: style.text }}
                     >
                       {item}
                     </span>
@@ -120,7 +123,7 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
             {/* Content (if not just items) */}
             {(!card.items || card.items.length === 0) && card.content !== card.title && (
               <p
-                className="text-[15px] font-medium tracking-tight mb-6 leading-relaxed"
+                className="text-[16px] font-medium tracking-tight mb-6 leading-[24px]"
                 style={{ color: style.text, opacity: 0.9 }}
               >
                 {card.content}
@@ -131,16 +134,16 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
             <button
               onClick={() => handleAddToBoard(card)}
               disabled={isAdded}
-              className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-full transition-colors disabled:opacity-50"
+              className="mt-6 flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border transition-colors hover:bg-white/10 shrink-0 disabled:opacity-50"
               style={{
-                backgroundColor: card.category === 'todo' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)',
+                backgroundColor: 'transparent',
                 color: style.text,
-                border: `1px solid ${card.category === 'todo' ? 'rgba(255,255,255,0.2)' : 'transparent'}`
+                borderColor: card.category === 'todo' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'
               }}
             >
               <span>{isAdded ? '✓ Added' : '+ Add to board'}</span>
               {!isAdded && (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               )}

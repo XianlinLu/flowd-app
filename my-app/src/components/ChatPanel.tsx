@@ -409,6 +409,35 @@ export function ChatPanel({
   const handleSaveToBoard = useCallback((message: Message) => {
     if (message.role !== 'assistant') return;
 
+    // Check if the message is a JSON array of cards
+    if ((message.content.includes('"newCards"') || message.content.includes('"category"')) && message.content.startsWith('[')) {
+      const cards = extractNewCardsFromResponse(message.content);
+      if (cards && cards.length > 0) {
+        cards.forEach(cardData => {
+          boardStore.addCard(cardData.category, {
+            title: cardData.title,
+            content: cardData.content,
+            sourceMessageId: message.id,
+            metadata: {
+              items: cardData.items,
+              aiGenerated: true,
+            },
+          });
+        });
+        
+        onCardsGenerated?.(cards.length);
+        
+        const notifyMessage: Message = {
+          id: `notify_${message.id}`,
+          role: 'assistant',
+          content: `✅ 已保存至左侧看板 - 包含 ${cards.length} 张卡片`,
+          timestamp: Date.now(),
+        };
+        setMessages(prev => [...prev, notifyMessage]);
+        return;
+      }
+    }
+
     // Determine card category based on content
     let category: ContentCategory = 'note';
     const content = message.content.toLowerCase();
@@ -560,6 +589,7 @@ export function ChatPanel({
   // Check if input is asking for tasks or progress
   const isAskingForTasks = (text: string): boolean => {
     const taskPatterns = [
+      /待办清单|待办|待处理|待完成|待执行|待跟进|待安排|待着手|待启动|待开展|待落实|待办理|待解决|待做|待弄|待办事项|待处理事项|待办任务|待办工作|待处理事务|待跟进事项|待落实事项|待办条目|待处理记录|待审|待批|待核|待确认|待审核|待审批|待核对|待复核|待受理|待办结|待处置|待批复|待审议|待规划|待筹备|待准备|待筹划|待定|待议|待商榷|待讨论|待研究|未办|未处理|未完成|未执行|未着手|未尽事宜|遗留事项|未完事项|悬而未决|有待处理|有待完成|有待解决|待办列表|任务清单|待做清单|待处理列表|代办清单/i,
       /给我列一个(?:待办|代办)/i,
       /接下来要做什么/i,
       /还有什么是待解决的/i,

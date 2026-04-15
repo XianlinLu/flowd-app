@@ -98,7 +98,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
 
         {/* Title */}
         <h4 
-          className={`font-medium text-[18px] leading-snug mb-4 ${!isModal && card.answer ? 'line-clamp-2 shrink-0' : (!isModal ? 'line-clamp-4' : '')}`}
+          className={`font-medium text-[18px] leading-snug ${!isModal && card.answer ? 'mb-2 line-clamp-2 shrink-0' : (!isModal ? 'mb-4 line-clamp-3' : 'mb-4')}`}
           style={{ color: config.textColor }}
         >
           {card.title}
@@ -106,11 +106,11 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
 
         {/* Answer section (if exists) */}
         {card.answer && (
-          <div className={`mt-4 p-4 rounded-xl bg-white/50 ${!isModal ? 'flex-1 overflow-hidden' : ''}`}>
-            <span className="text-[10px] tracking-widest uppercase block mb-2 shrink-0" style={{ color: config.textColor, opacity: 0.5 }}>
+          <div className={`mt-auto px-4 py-3 rounded-xl bg-white/50 flex flex-col ${!isModal ? 'flex-1 overflow-hidden' : ''}`}>
+            <span className="text-[10px] tracking-widest uppercase block mb-1 shrink-0" style={{ color: config.textColor, opacity: 0.5 }}>
               ANSWER
             </span>
-            <p className={`text-[16px] leading-[24px] italic ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
+            <p className={`text-[16px] leading-[22px] italic ${!isModal ? 'line-clamp-2' : ''}`} style={{ color: config.textColor }}>
               {card.answer}
             </p>
           </div>
@@ -123,7 +123,7 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
               e.stopPropagation();
               onChat?.(card);
             }}
-            className="mt-4 w-full py-3 px-4 rounded-xl border border-dashed flex items-center justify-center gap-2 transition-all hover:bg-white/30 shrink-0"
+            className="mt-auto w-full py-3 px-4 rounded-xl border border-dashed flex items-center justify-center gap-2 transition-all hover:bg-white/30 shrink-0"
             style={{ borderColor: `${config.textColor}40`, color: config.textColor }}
           >
             <span className="text-sm">Chat</span>

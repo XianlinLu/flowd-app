@@ -126,7 +126,7 @@ export function ChatPanel({
           });
 
           parsedMessages = parsedMessages.filter(msg => {
-            if (msg.role === 'assistant' && msg.content.startsWith('✅ 已保存至左侧看板')) {
+            if (msg.role === 'assistant' && (msg.content.startsWith('✅ 已保存至左侧看板') || msg.content.startsWith('✨ 已根据讨论生成'))) {
               // Legacy format: `msg_${Date.now()}_notify`, New format: `notify_${sourceMessageId}`
               if (msg.id.startsWith('notify_')) {
                 const sourceId = msg.id.replace('notify_', '');
@@ -537,7 +537,7 @@ export function ChatPanel({
           onCardsGenerated?.(createdCount);
           const cardNames = newCards.map(c => `「${c.title}」`).join('、');
           const notifyMessage: Message = {
-            id: `msg_${Date.now()}_notify`,
+            id: `notify_${agentMessage.id}`,
             role: 'assistant',
             content: `✨ 已根据讨论生成 ${createdCount} 张新卡片：${cardNames}`,
             timestamp: Date.now(),
@@ -1013,7 +1013,7 @@ export function ChatPanel({
           onCardsGenerated?.(createdCount);
           const cardNames = newCards.map(c => `「${c.title}」`).join('、');
           const notifyMessage: Message = {
-            id: `msg_${Date.now()}_notify`,
+            id: `notify_${agentMessage.id}`,
             role: 'assistant',
             content: `✨ 已根据讨论生成 ${createdCount} 张新卡片：${cardNames}`,
             timestamp: Date.now(),
@@ -1437,7 +1437,7 @@ ${docText}
                       </div>
                     )}
                     {/* Save to board button for AI messages */}
-                    {message.role === 'assistant' && !savedMessageIds.has(message.id) && !message.content.startsWith('✅') && !message.isTemporary && (
+                    {message.role === 'assistant' && !savedMessageIds.has(message.id) && !message.content.startsWith('✅') && !message.content.startsWith('✨ 已根据讨论生成') && !message.isTemporary && (
                       <button
                         onClick={() => handleSaveToBoard(message)}
                         className="mt-2 flex items-center gap-1.5 text-[14px] text-[#9EA8B0] font-medium px-4 py-1.5 rounded-full border-2 border-dashed border-[#9EA8B0] hover:bg-[#9EA8B0]/10 hover:text-[#7E898E] hover:border-[#7E898E] transition-all"

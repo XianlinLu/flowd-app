@@ -162,6 +162,30 @@ export function extractNewCardsFromResponse(response: string): Array<{
     }
   }
 
+  // 尝试提取 markdown 代码块中的 JSON
+  const codeBlockMatch = response.match(/```json\n([\s\S]*?)\n```/);
+  if (codeBlockMatch && cards.length === 0) {
+    try {
+      const parsedArray = JSON.parse(codeBlockMatch[1]);
+      if (Array.isArray(parsedArray)) {
+        parsedArray.forEach((card: any) => {
+          if (card.category && card.title) {
+            cards.push({
+              category: card.category as ContentCategory,
+              title: card.title,
+              content: card.content || card.title,
+              tags: card.tags || [],
+              items: card.items,
+              hasAttachment: card.hasAttachment,
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Failed to parse JSON array from markdown codeblock:', e);
+    }
+  }
+
   // 尝试提取 JSON 格式2（直接数组 [...]）
   const arrayMatch = response.match(/\[\s*\{[\s\S]*\}\s*\]/);
   if (arrayMatch && cards.length === 0) {

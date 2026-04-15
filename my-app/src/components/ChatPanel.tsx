@@ -409,33 +409,31 @@ export function ChatPanel({
   const handleSaveToBoard = useCallback((message: Message) => {
     if (message.role !== 'assistant') return;
 
-    // Check if the message is a JSON array of cards
-    if ((message.content.includes('"newCards"') || message.content.includes('"category"')) && message.content.startsWith('[')) {
-      const cards = extractNewCardsFromResponse(message.content);
-      if (cards && cards.length > 0) {
-        cards.forEach(cardData => {
-          boardStore.addCard(cardData.category, {
-            title: cardData.title,
-            content: cardData.content,
-            sourceMessageId: message.id,
-            metadata: {
-              items: cardData.items,
-              aiGenerated: true,
-            },
-          });
+    // Check if the message contains a JSON array of cards
+    const cards = extractNewCardsFromResponse(message.content);
+    if (cards && cards.length > 0) {
+      cards.forEach(cardData => {
+        boardStore.addCard(cardData.category, {
+          title: cardData.title,
+          content: cardData.content,
+          sourceMessageId: message.id,
+          metadata: {
+            items: cardData.items,
+            aiGenerated: true,
+          },
         });
-        
-        onCardsGenerated?.(cards.length);
-        
-        const notifyMessage: Message = {
-          id: `notify_${message.id}`,
-          role: 'assistant',
-          content: `✅ 已保存至左侧看板 - 包含 ${cards.length} 张卡片`,
-          timestamp: Date.now(),
-        };
-        setMessages(prev => [...prev, notifyMessage]);
-        return;
-      }
+      });
+      
+      onCardsGenerated?.(cards.length);
+      
+      const notifyMessage: Message = {
+        id: `notify_${message.id}`,
+        role: 'assistant',
+        content: `✅ 已保存至左侧看板 - 包含 ${cards.length} 张卡片`,
+        timestamp: Date.now(),
+      };
+      setMessages(prev => [...prev, notifyMessage]);
+      return;
     }
 
     // Determine card category based on content
@@ -979,8 +977,8 @@ export function ChatPanel({
       if (isTaskQuery) {
         systemPrompt = `你是 Flowd AI，一个嵌入在项目中的思考伙伴。
 用户正在询问项目进度或下一步的待办事项。
-【极其重要】：你必须且只能使用推荐卡片的格式进行回复，禁止输出任何长文本分析。
-请直接输出推荐卡片的JSON格式，如：
+请先用简短的自然语言回应用户的需求（比如梳理一下思路或总结进度），然后在回复的最后，必须使用 JSON 格式输出推荐的卡片（包含待办卡片、开放性问题等）。
+请务必将 JSON 放在 \`\`\`json 和 \`\`\` 之间。JSON 格式如下：
 \`\`\`json
 [
   {
@@ -998,7 +996,7 @@ export function ChatPanel({
   }
 ]
 \`\`\`
-再次强调：不要说“好的”、“根据项目进度”等废话，直接输出卡片。`;
+`;
       }
         
       const apiMessages: Message[] = [
@@ -1421,21 +1419,33 @@ ${docText}
                         </div>
                       </div>
                     )}
-                    {message.role === 'assistant' && (message.content.includes('"newCards"') || message.content.includes('"category"')) && message.content.startsWith('[') ? (
-                      <div className="text-sm leading-relaxed">
-                        <div className="mb-3 text-gray-500">已为你生成推荐卡片：</div>
-                        <div className="w-full">
-                          <AISuggestionCards 
-                            suggestions={extractNewCardsFromResponse(message.content).map((card, idx) => ({
-                              id: `suggestion_${idx}`,
-                              category: card.category,
-                              title: card.title,
-                              content: card.content,
-                              items: card.items
-                            }))}
-                            onAddToBoard={() => onCardsGenerated?.(1)}
-                          />
-                        </div>
+                    {message.role === 'assistant' ? (
+                      <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                        <div 
+                          dangerouslySetInnerHTML={{
+                            __html: message.content
+                              .replace(/```json\n[\s\S]*?\n```/g, '') // remove json block
+                              .replace(/\[\s*\{\s*"category"[\s\S]*?\]/g, '') // remove raw json array if any
+                              .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                              .replace(/→/g, '<span class="text-blue-500">→</span>')
+                              .replace(/💡/g, '<span>💡</span>')
+                          }}
+                        />
+                        {extractNewCardsFromResponse(message.content).length > 0 && (
+                          <div className="mt-4 w-full">
+                            <div className="mb-3 text-gray-500">已为你生成推荐卡片：</div>
+                            <AISuggestionCards 
+                              suggestions={extractNewCardsFromResponse(message.content).map((card, idx) => ({
+                                id: `suggestion_${idx}`,
+                                category: card.category,
+                                title: card.title,
+                                content: card.content,
+                                items: card.items
+                              }))}
+                              onAddToBoard={() => onCardsGenerated?.(1)}
+                            />
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div 

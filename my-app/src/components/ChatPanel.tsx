@@ -541,42 +541,6 @@ export function ChatPanel({
 
       setMessages((prev) => [...prev, agentMessage]);
       setStreamingContent('');
-
-      // Extract and create new cards from AI response
-      const newCards = extractNewCardsFromResponse(fullContent);
-      if (newCards.length > 0) {
-        let createdCount = 0;
-        
-        // Find the last attachment in the conversation
-        const lastAttachment = [...messages].reverse().find(m => m.attachment)?.attachment;
-        
-        newCards.forEach((cardData) => {
-          const newCard = boardStore.addCard(cardData.category, {
-            title: cardData.title,
-            content: cardData.content,
-            sourceMessageId: agentMessage.id,
-            metadata: {
-              tags: cardData.tags,
-              aiGenerated: true,
-              items: cardData.items,
-              ...(cardData.hasAttachment && lastAttachment ? { attachment: lastAttachment } : {})
-            },
-          });
-          if (newCard) createdCount++;
-        });
-        
-        if (createdCount > 0) {
-          onCardsGenerated?.(createdCount);
-          const cardNames = newCards.map(c => `「${c.title}」`).join('、');
-          const notifyMessage: Message = {
-            id: `notify_${agentMessage.id}`,
-            role: 'assistant',
-            content: `✨ 已根据讨论生成 ${createdCount} 张新卡片：${cardNames}`,
-            timestamp: Date.now(),
-          };
-          setMessages((prev) => [...prev, notifyMessage]);
-        }
-      }
     } catch (error) {
       console.error('Drag discussion error:', error);
     } finally {
@@ -654,18 +618,9 @@ export function ChatPanel({
 
   // Auto save user idea to board
   const autoSaveIdeaToBoard = async (content: string, file: File | null): Promise<boolean> => {
-    // Check if it's asking for tasks first
+    // Do not auto-save task/progress queries since they shouldn't appear on the board until the user explicitly saves AI's response
     if (isAskingForTasks(content)) {
-      const newCard = boardStore.addCard('open_question', {
-        title: content.substring(0, 30) + (content.length > 30 ? '...' : ''),
-        content: content,
-        metadata: {
-          aiGenerated: false,
-          tags: ['进度询问'],
-        },
-      });
-      if (newCard) onCardsGenerated?.(1);
-      return true; // Still return true to show the auto-save notification
+      return false;
     }
 
     const { isMatch, isDecision } = isIdeaOrDecision(content);
@@ -1019,41 +974,6 @@ export function ChatPanel({
 
       setMessages((prev) => [...prev, agentMessage]);
       setStreamingContent('');
-
-      const newCards = extractNewCardsFromResponse(fullContent);
-      if (newCards.length > 0) {
-        let createdCount = 0;
-        
-        // Find the last attachment in the conversation
-        const lastAttachment = [...apiMessages].reverse().find(m => m.attachment)?.attachment;
-        
-        newCards.forEach((cardData) => {
-          const newCard = boardStore.addCard(cardData.category, {
-            title: cardData.title,
-            content: cardData.content,
-            sourceMessageId: agentMessage.id,
-            metadata: {
-              tags: cardData.tags,
-              aiGenerated: true,
-              items: cardData.items,
-              ...(cardData.hasAttachment && lastAttachment ? { attachment: lastAttachment } : {})
-            },
-          });
-          if (newCard) createdCount++;
-        });
-        
-        if (createdCount > 0) {
-          onCardsGenerated?.(createdCount);
-          const cardNames = newCards.map(c => `「${c.title}」`).join('、');
-          const notifyMessage: Message = {
-            id: `notify_${agentMessage.id}`,
-            role: 'assistant',
-            content: `✨ 已根据讨论生成 ${createdCount} 张新卡片：${cardNames}`,
-            timestamp: Date.now(),
-          };
-          setMessages((prev) => [...prev, notifyMessage]);
-        }
-      }
     } catch (error) {
       console.error('Chat error:', error);
       const errorMessage: Message = {

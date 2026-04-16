@@ -196,7 +196,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       const systemPrompt = `你是一个项目总结助手。请根据当前项目的所有卡片内容，生成结构化的项目总结和待解决事项。
 请严格返回 JSON 格式，包含以下两个字段：
 {
-  "summary": "包含以下六个段落的文本（使用换行符分隔，不要使用markdown加粗）：\\n项目如何开始：...\\n项目如何演变：...\\n探索过及放弃的内容：...\\n已决定的内容：...\\n产出成果：...\\n目前进展：...",
+  "summary": "包含以下六个段落的文本，必须严格使用 markdown 格式分段，段落标题必须用加粗的英文星号包围，不要使用特殊字符前缀，不要有多余换行：\\n**How it began**\\n这里写内容...\\n\\n**How it evolved**\\n这里写内容...\\n\\n**What was explored and discarded**\\n这里写内容...\\n\\n**What was decided**\\n这里写内容...\\n\\n**Output & Results**\\n这里写内容...\\n\\n**Current Status**\\n这里写内容...",
   "todos": ["待办事项1", "待办事项2"]
 }
 绝对不要输出除 JSON 之外的任何内容。如果看板为空，请生成一个默认的空总结。`;
@@ -1158,11 +1158,18 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       {/* Wrap-up Modal */}
       {isWrapUpModalOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-8 animate-scale-in max-h-[90vh] flex flex-col">
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">{projectName} 工作流回顾...</h3>
-            <p className="text-gray-500 mb-6">正在总结当前项目的核心内容</p>
+          <div className="bg-[#f0efea] rounded-2xl shadow-2xl w-full max-w-[640px] p-10 animate-scale-in max-h-[90vh] flex flex-col relative border border-white/50">
             
-            <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+            <button 
+              onClick={() => setIsWrapUpModalOpen(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+
+            <h3 className="text-[28px] font-bold text-[#8c8e8c] mb-8 tracking-tight">Wrap up: <span className="text-[#111]">{projectName}</span></h3>
+            
+            <div className="flex-1 overflow-y-auto pr-4 space-y-6">
               {isWrapUpLoading ? (
                 <div className="space-y-4">
                   <div className="animate-pulse flex space-x-4">
@@ -1176,93 +1183,96 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                   </div>
                 </div>
               ) : (
-                <div className="text-sm text-gray-600 leading-relaxed border-l-2 border-[#1B1D1F] pl-4 bg-gray-50/50 py-3 rounded-r-lg whitespace-pre-wrap">
-                  <p className="font-semibold text-gray-900 mb-2">项目总结报告</p>
-                  {wrapUpData.summary || '暂无总结内容。'}
+                <div className="text-[15px] text-[#333] leading-relaxed py-4 pr-4 whitespace-pre-wrap font-[400] tracking-wide space-y-6">
+                  <div dangerouslySetInnerHTML={{ 
+                    __html: wrapUpData.summary
+                      .replace(/\*\*(.*?)\*\*/g, '<h3 class="text-[20px] font-bold text-[#111] mb-2 mt-6 tracking-tight">$1</h3>')
+                      || '暂无总结内容。' 
+                  }} />
                 </div>
               )}
               
-              <div className="mt-8">
-                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                  待解决事项
-                </h4>
+              <div className="mt-8 pt-6 border-t border-gray-300/50">
                 {isWrapUpLoading ? (
-                  <div className="bg-[#1B1D1F] rounded-xl p-4 text-white animate-pulse">
-                    <div className="h-4 bg-white/20 rounded w-1/4 mb-4"></div>
+                  <div className="bg-white rounded-xl p-6 text-gray-800 animate-pulse border border-gray-200">
+                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
                     <div className="space-y-3">
-                      <div className="h-4 bg-white/20 rounded w-3/4"></div>
-                      <div className="h-4 bg-white/20 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-[#1B1D1F] rounded-xl p-4 text-white">
-                    <div className="font-medium mb-3">遗留任务</div>
-                    <div className="space-y-2">
-                      {wrapUpData.todos.map((todo, idx) => (
-                        <div key={idx} className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded border-2 border-white/30"></div>
-                          <span>{todo}</span>
-                        </div>
-                      ))}
-                      {wrapUpData.todos.length === 0 && (
-                        <div className="text-white/50 text-sm">暂无遗留任务</div>
-                      )}
+                  <div className="bg-white rounded-xl p-6 text-gray-800 shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Left Open</span>
+                    </div>
+                    <h4 className="font-semibold text-[15px] mb-4 text-gray-900">Q: Logic, rules?</h4>
+                    
+                    {wrapUpData.todos.length > 0 && (
+                      <div className="space-y-3 mb-6">
+                        {wrapUpData.todos.map((todo, idx) => (
+                          <div key={idx} className="flex items-start gap-3">
+                            <input 
+                              type="checkbox" 
+                              className="mt-1 w-4 h-4 rounded-sm border-gray-300 text-gray-600 focus:ring-gray-500" 
+                            />
+                            <span className="text-[14px] text-gray-600 leading-relaxed">{todo}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {wrapUpData.todos.length === 0 && (
+                      <p className="text-[14px] text-gray-500 italic mb-6">No open items found.</p>
+                    )}
+                    
+                    <div className="flex items-start gap-3">
+                      <input type="checkbox" className="mt-1 w-4 h-4 rounded-sm border-gray-300 text-gray-600 focus:ring-gray-500" />
+                      <span className="text-[14px] text-gray-500">I understand these items will be carried as unresolved in the closed Doc.</span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
             
-            <div className="mt-6 pt-4 border-t border-gray-100">
-              <label className="flex items-center gap-3 cursor-pointer group mb-6">
-                <div className="relative flex items-center justify-center">
-                  <input type="checkbox" className="peer sr-only" defaultChecked />
-                  <div className="w-5 h-5 border-2 border-gray-300 rounded bg-white peer-checked:bg-[#1B1D1F] peer-checked:border-[#1B1D1F] transition-colors"></div>
-                  <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                </div>
-                <span className="text-sm text-gray-600 select-none">我了解这些项将在关闭的文档中作为未解决项携带。</span>
-              </label>
-              
-              <div className="flex justify-end gap-3">
-                <button 
-                  onClick={() => setIsWrapUpModalOpen(false)}
-                  className="px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  取消
-                </button>
-                <button 
-                  onClick={() => {
-                    boardStore.addCard('note', {
+            <div className="mt-8 flex justify-end gap-3 shrink-0">
+              <button
+                onClick={() => setIsWrapUpModalOpen(false)}
+                className="px-6 py-2.5 rounded-full text-sm font-semibold text-gray-500 hover:bg-gray-200 transition-colors bg-white border border-gray-200 uppercase tracking-wider"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (wrapUpData.summary) {
+                    const added = boardStore.addCard('note', {
                       title: '项目总结报告',
                       content: wrapUpData.summary,
-                      metadata: {
-                        aiGenerated: true,
-                        tags: ['总结']
-                      }
-                    }, 'workspace');
+                      metadata: { tags: ['总结', '归档'] }
+                    });
                     
                     if (wrapUpData.todos.length > 0) {
                       boardStore.addCard('todo', {
-                        title: '待解决事项',
-                        content: '遗留任务',
-                        metadata: {
-                          aiGenerated: true,
-                          tags: ['待办'],
+                        title: '遗留待办事项',
+                        content: '项目归档时遗留的待处理事项',
+                        metadata: { 
+                          tags: ['遗留任务'],
                           items: wrapUpData.todos,
                           checkedItems: new Array(wrapUpData.todos.length).fill(false)
                         }
-                      }, 'workspace');
+                      });
                     }
-                    setIsWrapUpModalOpen(false);
-                  }}
-                  className="px-6 py-2.5 text-sm font-medium text-white rounded-xl transition-colors shadow-lg disabled:opacity-50"
-                  style={{ backgroundColor: '#1B1D1F' }}
-                  disabled={isWrapUpLoading}
-                >
-                  确认收尾
-                </button>
-              </div>
+                    
+                    if (added) {
+                      setIsWrapUpModalOpen(false);
+                    }
+                  }
+                }}
+                className="px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-colors bg-[#8c8e8c] hover:bg-gray-500 shadow-sm uppercase tracking-wider"
+                disabled={isWrapUpLoading}
+              >
+                Confirm Wrap-up
+              </button>
             </div>
           </div>
         </div>

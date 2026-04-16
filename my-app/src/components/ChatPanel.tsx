@@ -1344,8 +1344,8 @@ ${docText}
                         <div 
                           dangerouslySetInnerHTML={{
                             __html: message.content
-                              .replace(/```json\n[\s\S]*?\n```/g, '') // remove json block
-                              .replace(/\[\s*\{\s*"category"[\s\S]*?\]/g, '') // remove raw json array if any
+                              .replace(/```json\n[\s\S]*?(?:\n```|$)/g, '') // remove json block safely
+                              .replace(/\[\s*\{\s*"category"[\s\S]*?(?:\]|$)/g, '') // remove raw json array safely
                               .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                               .replace(/→/g, '<span class="text-blue-500">→</span>')
                               .replace(/💡/g, '<span>💡</span>')
@@ -1372,6 +1372,8 @@ ${docText}
                         className="text-sm leading-relaxed whitespace-pre-wrap"
                         dangerouslySetInnerHTML={{
                           __html: message.content
+                            .replace(/```json\n[\s\S]*?(?:\n```|$)/g, '') // remove json block safely
+                            .replace(/\[\s*\{\s*"category"[\s\S]*?(?:\]|$)/g, '') // remove raw json array safely
                             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                             .replace(/→/g, '<span class="text-blue-500">→</span>')
                             .replace(/💡/g, '<span>💡</span>')
@@ -1427,7 +1429,16 @@ ${docText}
                 <div className="flex justify-start animate-fade-in">
                   <div className="max-w-[90%] rounded-2xl px-4 py-3 bg-transparent">
                     <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {streamingContent}
+                      <div 
+                        dangerouslySetInnerHTML={{
+                          __html: streamingContent
+                            .replace(/```json\n[\s\S]*?/g, '') // hide incomplete json blocks
+                            .replace(/\[\s*\{\s*"category"[\s\S]*?/g, '') // hide incomplete json array
+                            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/→/g, '<span class="text-blue-500">→</span>')
+                            .replace(/💡/g, '<span>💡</span>')
+                        }}
+                      />
                       <span className="animate-pulse">▊</span>
                     </div>
                   </div>

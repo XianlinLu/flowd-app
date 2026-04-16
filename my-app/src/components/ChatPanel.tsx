@@ -616,62 +616,8 @@ export function ChatPanel({
     return { isMatch: false, isDecision: false };
   };
 
-  // Auto save user idea to board
+  // Auto save user idea to board (Temporarily disabled per user request: "左边卡片看板中的卡片不能和右边agent对话聊天的卡片内容重复")
   const autoSaveIdeaToBoard = async (content: string, file: File | null): Promise<boolean> => {
-    // Do not auto-save task/progress queries since they shouldn't appear on the board until the user explicitly saves AI's response
-    if (isAskingForTasks(content)) {
-      return false;
-    }
-
-    const { isMatch, isDecision } = isIdeaOrDecision(content);
-    // If it doesn't match idea patterns, but has an image with some descriptive text or just an image, we can still save it
-    if (!isMatch && !file) return false;
-
-    // Extract title from first sentence or first 30 chars
-    let title = content.split(/[。！？.!?]/)[0].substring(0, 30);
-    if (title.length === 30) title += '...';
-    if (!title && file) title = file.name;
-    
-    // Determine category based on content
-    let category: ContentCategory = isDecision ? 'decided' : 'note'; // Default to note for ideas
-    
-    // If it contains decision-like words, make it a decision
-    if (!isDecision && /决定|确定|选定|采用|使用|方案/i.test(content)) {
-      category = 'decided';
-    }
-
-    let fileUrl = '';
-    if (file) {
-      // Convert file to base64 string to persist across reloads
-      fileUrl = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.onerror = () => resolve(URL.createObjectURL(file)); // Fallback to blob URL on error
-        reader.readAsDataURL(file);
-      });
-    }
-
-    const newCard = boardStore.addCard(category, {
-      title: title || '新想法',
-      content: content,
-      metadata: {
-        aiGenerated: false,
-        tags: [category === 'decided' ? '决策' : (file ? '附件' : '想法')],
-        ...(file ? {
-          attachment: {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            url: fileUrl
-          }
-        } : {})
-      },
-    });
-
-    if (newCard) {
-      onCardsGenerated?.(1);
-      return true;
-    }
     return false;
   };
 
@@ -933,15 +879,16 @@ export function ChatPanel({
         systemPrompt = `你是 Flowd AI，一个嵌入在项目中的思考伙伴。
 用户正在询问项目进度或下一步的待办事项。
 请先用简短的自然语言回应用户的需求（比如梳理一下思路或总结进度），然后在回复的最后，必须使用 JSON 格式输出推荐的卡片（包含待办卡片、开放性问题等）。
+【注意】：如果待办事项包含多个阶段或非常多，请不要一次性把所有任务全部塞进一张卡片。每次只生成“当前最近一个阶段”需要完成的事项，保持卡片轻量且聚焦。
 请务必将 JSON 放在 \`\`\`json 和 \`\`\` 之间。JSON 格式如下：
 \`\`\`json
 [
   {
-    "title": "下一步核心任务",
-    "content": "根据当前进度，我们需要优先处理以下工作",
+    "title": "当前阶段核心任务",
+    "content": "根据进度，我们先专注完成以下第一步工作",
     "category": "todo",
     "tags": ["任务"],
-    "items": ["完成基础框架搭建", "测试核心功能", "修复已知Bug"]
+    "items": ["完成基础框架搭建", "测试核心功能"]
   },
   {
     "title": "当前遗留问题",
@@ -1404,7 +1351,7 @@ ${docText}
                       </div>
                     )}
                     {/* Save to board button for AI messages */}
-                    {message.role === 'assistant' && !savedMessageIds.has(message.id) && !message.content.startsWith('✅') && !message.content.startsWith('✨ 已根据讨论生成') && !message.isTemporary && (
+                    {message.role === 'assistant' && !savedMessageIds.has(message.id) && !message.content.startsWith('✅') && !message.content.startsWith('✨ 已根据讨论生成') && !message.isTemporary && extractNewCardsFromResponse(message.content).length === 0 && (
                       <button
                         onClick={() => handleSaveToBoard(message)}
                         className="mt-2 flex items-center gap-1.5 text-[14px] text-[#9EA8B0] font-medium px-4 py-1.5 rounded-full border-2 border-dashed border-[#9EA8B0] hover:bg-[#9EA8B0]/10 hover:text-[#7E898E] hover:border-[#7E898E] transition-all"

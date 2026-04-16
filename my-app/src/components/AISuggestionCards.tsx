@@ -46,9 +46,9 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
         };
       case 'open_question':
         return {
-          bg: '#e0fa9d', // Lime green matching design
-          text: '#1a3a3a', // Dark teal text
-          label: 'OPEN QUESTION',
+          bg: '#E3FF96', // Lime green matching design
+          text: '#854d0e', // Dark text
+          label: '待讨论的问题',
         };
       default:
         return {
@@ -60,7 +60,7 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
   };
 
   return (
-    <div className="flex flex-nowrap overflow-x-auto gap-4 py-2 pb-4 snap-x">
+    <div className="flex flex-nowrap overflow-x-auto gap-4 py-2 pb-4 snap-x items-start">
       {suggestions.map((card) => {
         const style = getCardStyle(card.category);
         const isAdded = addedCards.has(card.id);
@@ -73,7 +73,7 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
           >
             {/* Background watermark for OPEN QUESTION */}
             {card.category === 'open_question' && (
-              <div className="absolute top-2 right-4 text-8xl font-bold opacity-10 pointer-events-none select-none" style={{ color: style.text }}>
+              <div className="absolute right-[-10%] top-[-10%] text-[150px] font-bold opacity-10 pointer-events-none select-none leading-none" style={{ color: style.text }}>
                 ?
               </div>
             )}
@@ -134,14 +134,14 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
             <button
               onClick={() => handleAddToBoard(card)}
               disabled={isAdded}
-              className="mt-6 flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border transition-colors hover:bg-white/10 shrink-0 disabled:opacity-50"
+              className="mt-auto flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border transition-colors hover:bg-white/10 shrink-0 disabled:opacity-50 self-start"
               style={{
                 backgroundColor: 'transparent',
                 color: style.text,
                 borderColor: card.category === 'todo' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'
               }}
             >
-              <span>{isAdded ? '✓ Added' : '+ Add to board'}</span>
+              <span>{isAdded ? '✓ 已保存' : '+ 保存至左侧看板'}</span>
               {!isAdded && (
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />

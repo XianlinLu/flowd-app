@@ -879,7 +879,9 @@ export function ChatPanel({
         systemPrompt = `你是 Flowd AI，一个嵌入在项目中的思考伙伴。
 用户正在询问项目进度或下一步的待办事项。
 请先用简短的自然语言回应用户的需求（比如梳理一下思路或总结进度），然后在回复的最后，必须使用 JSON 格式输出推荐的卡片（包含待办卡片、开放性问题等）。
-【注意】：如果待办事项包含多个阶段或非常多，请不要一次性把所有任务全部塞进一张卡片。每次只生成“当前最近一个阶段”需要完成的事项，保持卡片轻量且聚焦。
+【注意】：
+1. 如果待办事项包含多个阶段或非常多，请不要一次性把所有任务全部塞进一张卡片。每次只生成“当前最近一个阶段”需要完成的事项，保持卡片轻量且聚焦。
+2. 如果待讨论的问题包含多个，请不要一次性列出所有问题。每次只生成“最核心/最先需要讨论的一个”开放性问题卡片。
 请务必将 JSON 放在 \`\`\`json 和 \`\`\` 之间。JSON 格式如下：
 \`\`\`json
 [
@@ -1291,8 +1293,8 @@ ${docText}
                         <div 
                           dangerouslySetInnerHTML={{
                             __html: message.content
-                              .replace(/```json\n[\s\S]*?(?:\n```|$)/g, '') // remove json block safely
-                              .replace(/\[\s*\{\s*"category"[\s\S]*?(?:\]|$)/g, '') // remove raw json array safely
+                              .replace(/```(?:json)?\n?[\s\S]*?(?:\n```|$)/gi, '') // remove json block safely, matching any language specifier optionally
+                              .replace(/\[\s*\{\s*"(?:title|category)"[\s\S]*?(?:\]|$)/gi, '') // remove raw json array safely
                               .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                               .replace(/→/g, '<span class="text-blue-500">→</span>')
                               .replace(/💡/g, '<span>💡</span>')
@@ -1323,8 +1325,8 @@ ${docText}
                         className="text-sm leading-relaxed whitespace-pre-wrap"
                         dangerouslySetInnerHTML={{
                           __html: message.content
-                            .replace(/```json\n[\s\S]*?(?:\n```|$)/g, '') // remove json block safely
-                            .replace(/\[\s*\{\s*"category"[\s\S]*?(?:\]|$)/g, '') // remove raw json array safely
+                            .replace(/```(?:json)?\n?[\s\S]*?(?:\n```|$)/gi, '') // remove json block safely
+                            .replace(/\[\s*\{\s*"(?:title|category)"[\s\S]*?(?:\]|$)/gi, '') // remove raw json array safely
                             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                             .replace(/→/g, '<span class="text-blue-500">→</span>')
                             .replace(/💡/g, '<span>💡</span>')
@@ -1383,8 +1385,8 @@ ${docText}
                       <div 
                         dangerouslySetInnerHTML={{
                           __html: streamingContent
-                            .replace(/```json\n[\s\S]*?/g, '') // hide incomplete json blocks
-                            .replace(/\[\s*\{\s*"category"[\s\S]*?/g, '') // hide incomplete json array
+                            .replace(/```(?:json)?\n?[\s\S]*?(?:\n```|$)/gi, '') // hide incomplete json blocks
+                            .replace(/\[\s*\{\s*"(?:title|category)"[\s\S]*?(?:\]|$)/gi, '') // hide incomplete json array
                             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                             .replace(/→/g, '<span class="text-blue-500">→</span>')
                             .replace(/💡/g, '<span>💡</span>')

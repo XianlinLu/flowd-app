@@ -1300,18 +1300,22 @@ ${docText}
                         />
                         {extractNewCardsFromResponse(message.content).length > 0 && (
                           <div className="mt-4 w-full">
-                            <div className="mb-3 text-gray-500">已为你生成推荐卡片：</div>
-                            <AISuggestionCards 
-                              suggestions={extractNewCardsFromResponse(message.content).map((card, idx) => ({
-                                id: `suggestion_${idx}`,
-                                category: card.category,
-                                title: card.title,
-                                content: card.content,
-                                items: card.items
-                              }))}
-                              onAddToBoard={() => onCardsGenerated?.(1)}
-                            />
-                          </div>
+                        <div className="mb-3 text-gray-500">已为你生成推荐卡片：</div>
+                        <AISuggestionCards 
+                          suggestions={extractNewCardsFromResponse(message.content).map((card, idx) => ({
+                            id: `suggestion_${idx}`,
+                            category: card.category,
+                            title: card.title,
+                            content: card.content,
+                            items: card.items
+                          }))}
+                          onAddToBoard={() => {
+                            // Trigger re-render to update 'added' status
+                            setMessages([...messages]);
+                            onCardsGenerated?.(1);
+                          }}
+                        />
+                      </div>
                         )}
                       </div>
                     ) : (

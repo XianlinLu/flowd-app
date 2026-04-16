@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { ContentCategory } from '@/types/board';
 import { boardStore } from '@/lib/board-store';
 
@@ -18,7 +17,6 @@ interface AISuggestionCardsProps {
 }
 
 export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCardsProps) {
-  const [addedCards, setAddedCards] = useState<Set<string>>(new Set());
 
   const handleAddToBoard = (card: SuggestionCard) => {
     const newCard = boardStore.addCard(card.category, {
@@ -31,7 +29,6 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
     });
     
     if (newCard) {
-      setAddedCards(prev => new Set(prev).add(card.id));
       onAddToBoard?.();
     }
   };
@@ -63,7 +60,10 @@ export function AISuggestionCards({ suggestions, onAddToBoard }: AISuggestionCar
     <div className="flex flex-nowrap overflow-x-auto gap-4 py-2 pb-4 snap-x items-start">
       {suggestions.map((card) => {
         const style = getCardStyle(card.category);
-        const isAdded = addedCards.has(card.id);
+        
+        // Dynamically check if the card is already in the board based on title and content
+        // We use a combination of title and content to match to avoid false positives
+        const isAdded = boardStore.getAllCards().some(c => c.title === card.title && c.category === card.category);
         
         return (
           <div

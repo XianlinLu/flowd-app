@@ -606,12 +606,25 @@ export function FlowdCard({ card, onUpdate, onDelete, onAddToBoard, onChat, onCl
         {/* Content */}
         {card.content !== card.title && (
           <div className={`relative mt-2 ${!isModal ? 'flex-1 overflow-hidden' : ''}`}>
-            <p 
-              className={`text-[16px] leading-[24px] opacity-80 ${!isModal && hasImage ? 'line-clamp-1' : (!isModal ? 'line-clamp-4' : '')}`}
-              style={{ color: config.textColor }}
-            >
-              {card.content}
-            </p>
+            {card.content.includes('**') ? (
+              <div 
+                className={`text-[16px] leading-[24px] opacity-80 ${!isModal && hasImage ? 'line-clamp-1' : (!isModal ? 'line-clamp-4' : '')}`}
+                style={{ color: config.textColor }}
+                dangerouslySetInnerHTML={{
+                  __html: card.content
+                    .replace(/\*\*(.*?)\*\*/g, '<h3 class="text-[18px] font-bold mt-4 mb-2">$1</h3>')
+                    .replace(/\\n/g, '<br/>')
+                    .replace(/\n/g, '<br/>')
+                }}
+              />
+            ) : (
+              <p 
+                className={`text-[16px] leading-[24px] opacity-80 whitespace-pre-wrap ${!isModal && hasImage ? 'line-clamp-1' : (!isModal ? 'line-clamp-4' : '')}`}
+                style={{ color: config.textColor }}
+              >
+                {card.content}
+              </p>
+            )}
           </div>
         )}
 

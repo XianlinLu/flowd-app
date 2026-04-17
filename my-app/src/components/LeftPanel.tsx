@@ -1167,7 +1167,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
-            <h3 className="text-[28px] font-bold text-[#8c8e8c] mb-8 tracking-tight">Wrap up: <span className="text-[#111]">{projectName}</span></h3>
+            <h3 className="text-[28px] font-bold text-[#8c8e8c] mb-8 tracking-tight">项目总结：<span className="text-[#111]">{projectName}</span></h3>
             
             <div className="flex-1 overflow-y-auto pr-4 space-y-6">
               {isWrapUpLoading ? (
@@ -1204,9 +1204,8 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                 ) : (
                   <div className="bg-white rounded-xl p-6 text-gray-800 shadow-sm border border-gray-100">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Left Open</span>
+                      <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">遗留待办事项</span>
                     </div>
-                    <h4 className="font-semibold text-[15px] mb-4 text-gray-900">Q: Logic, rules?</h4>
                     
                     {wrapUpData.todos.length > 0 && (
                       <div className="space-y-3 mb-6">
@@ -1223,12 +1222,12 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                     )}
                     
                     {wrapUpData.todos.length === 0 && (
-                      <p className="text-[14px] text-gray-500 italic mb-6">No open items found.</p>
+                      <p className="text-[14px] text-gray-500 italic mb-6">没有发现遗留事项。</p>
                     )}
                     
                     <div className="flex items-start gap-3">
                       <input type="checkbox" className="mt-1 w-4 h-4 rounded-sm border-gray-300 text-gray-600 focus:ring-gray-500" />
-                      <span className="text-[14px] text-gray-500">I understand these items will be carried as unresolved in the closed Doc.</span>
+                      <span className="text-[14px] text-gray-500">我了解这些事项将在归档文档中作为未解决项保留。</span>
                     </div>
                   </div>
                 )}
@@ -1240,7 +1239,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                 onClick={() => setIsWrapUpModalOpen(false)}
                 className="px-6 py-2.5 rounded-full text-sm font-semibold text-gray-500 hover:bg-gray-200 transition-colors bg-white border border-gray-200 uppercase tracking-wider"
               >
-                Cancel
+                取消
               </button>
               <button
                 onClick={() => {
@@ -1271,7 +1270,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                 className="px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-colors bg-[#8c8e8c] hover:bg-gray-500 shadow-sm uppercase tracking-wider"
                 disabled={isWrapUpLoading}
               >
-                Confirm Wrap-up
+                确认归档
               </button>
             </div>
           </div>

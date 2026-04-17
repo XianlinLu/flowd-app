@@ -140,7 +140,7 @@ class BoardStore {
     targetSectionId?: string
   ): Card {
     const type = this.categoryToType(category);
-    const sectionId = targetSectionId || this.getSectionForCategory(category);
+    const sectionId = targetSectionId || this.getSectionForCategory(category, card.metadata);
     const section = this.sections.find(s => s.id === sectionId) || this.sections[0];
     
     const newCard: Card = {
@@ -175,13 +175,32 @@ class BoardStore {
     return mapping[category];
   }
 
-  private getSectionForCategory(category: ContentCategory): string {
+  private getSectionForCategory(category: ContentCategory, metadata?: any): string {
     if (category === 'meeting' || category === 'prd' || category === 'bug' || category === 'bookmark') {
       return 'office_efficiency';
     }
-    // Simple logic: onboarding-related cards go to onboarding section
-    // This can be enhanced with AI analysis
-    return 'onboarding';
+    
+    // 如果明确指定了 sectionId
+    if (metadata?.sectionId) {
+      return metadata.sectionId;
+    }
+
+    // 基于标签进行简单的启发式归类
+    if (metadata?.tags && Array.isArray(metadata.tags)) {
+      const tagsStr = metadata.tags.join(',').toLowerCase();
+      if (tagsStr.includes('总结') || tagsStr.includes('归档') || tagsStr.includes('执行') || tagsStr.includes('设计') || tagsStr.includes('开发') || tagsStr.includes('进度') || tagsStr.includes('遗留')) {
+        return 'workspace'; // 落地执行与设计
+      }
+      if (tagsStr.includes('构思') || tagsStr.includes('调研') || tagsStr.includes('探索') || tagsStr.includes('灵感') || tagsStr.includes('想法')) {
+        return 'onboarding'; // 前期构思与调研
+      }
+    }
+
+    // 默认归类：todo/open_question 倾向于执行阶段，decided/note 倾向于前期构思
+    if (category === 'todo' || category === 'open_question') {
+      return 'workspace'; // 落地执行与设计
+    }
+    return 'onboarding'; // 前期构思与调研
   }
 
   updateCard(cardId: string, updates: Partial<Card>) {

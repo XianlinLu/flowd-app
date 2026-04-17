@@ -835,6 +835,10 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       {sections.filter(s => s.id !== 'about').map((section) => {
         const displayCards = section.cards.filter(card => !card.metadata?.isAboutFlowd);
         
+        if (displayCards.length === 0) {
+          return null; // Do not render section if it has no cards
+        }
+        
         return (
           <div key={section.id} className="animate-slide-in bg-[#D5DCDE] rounded-3xl p-5 shadow-sm border border-white/30">
             {/* Section Header */}

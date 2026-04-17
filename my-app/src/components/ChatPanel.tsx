@@ -1294,7 +1294,8 @@ ${docText}
                           dangerouslySetInnerHTML={{
                             __html: message.content
                               .replace(/```(?:json)?\n?[\s\S]*?(?:\n```|$)/gi, '') // remove json block safely, matching any language specifier optionally
-                              .replace(/\[\s*\{\s*"(?:title|category)"[\s\S]*?(?:\]|$)/gi, '') // remove raw json array safely
+                              .replace(/\{\s*"(?:title|category|type|content)"[\s\S]*?(?:\}|$)/gi, '') // handle generic json object format fallback
+                              .replace(/\[\s*\{\s*"(?:title|category|type)"[\s\S]*?(?:\]|$)/gi, '') // remove raw json array safely
                               .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                               .replace(/→/g, '<span class="text-blue-500">→</span>')
                               .replace(/💡/g, '<span>💡</span>')
@@ -1326,7 +1327,8 @@ ${docText}
                         dangerouslySetInnerHTML={{
                           __html: message.content
                             .replace(/```(?:json)?\n?[\s\S]*?(?:\n```|$)/gi, '') // remove json block safely
-                            .replace(/\[\s*\{\s*"(?:title|category)"[\s\S]*?(?:\]|$)/gi, '') // remove raw json array safely
+                            .replace(/\{\s*"(?:title|category|type|content)"[\s\S]*?(?:\}|$)/gi, '') // handle generic json object format fallback
+                            .replace(/\[\s*\{\s*"(?:title|category|type)"[\s\S]*?(?:\]|$)/gi, '') // remove raw json array safely
                             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                             .replace(/→/g, '<span class="text-blue-500">→</span>')
                             .replace(/💡/g, '<span>💡</span>')
@@ -1386,7 +1388,8 @@ ${docText}
                         dangerouslySetInnerHTML={{
                           __html: streamingContent
                             .replace(/```(?:json)?\n?[\s\S]*?(?:\n```|$)/gi, '') // hide incomplete json blocks
-                            .replace(/\[\s*\{\s*"(?:title|category)"[\s\S]*?(?:\]|$)/gi, '') // hide incomplete json array
+                            .replace(/\{\s*"(?:title|category|type|content)"[\s\S]*?(?:\}|$)/gi, '') // handle generic json object format fallback
+                            .replace(/\[\s*\{\s*"(?:title|category|type)"[\s\S]*?(?:\]|$)/gi, '') // hide incomplete json array
                             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                             .replace(/→/g, '<span class="text-blue-500">→</span>')
                             .replace(/💡/g, '<span>💡</span>')

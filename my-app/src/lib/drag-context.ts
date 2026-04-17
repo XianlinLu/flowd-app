@@ -163,24 +163,23 @@ export function extractNewCardsFromResponse(response: string): Array<{
   }
 
   // 尝试提取 markdown 代码块中的 JSON
-  const codeBlockMatch = response.match(/```json\n([\s\S]*?)\n```/);
+  const codeBlockMatch = response.match(/```(?:json)?\n([\s\S]*?)\n```/);
   if (codeBlockMatch && cards.length === 0) {
     try {
-      const parsedArray = JSON.parse(codeBlockMatch[1]);
-      if (Array.isArray(parsedArray)) {
-        parsedArray.forEach((card: any) => {
-          if (card.category && card.title) {
-            cards.push({
-              category: card.category as ContentCategory,
-              title: card.title,
-              content: card.content || card.title,
-              tags: card.tags || [],
-              items: card.items,
-              hasAttachment: card.hasAttachment,
-            });
-          }
-        });
-      }
+      const parsed = JSON.parse(codeBlockMatch[1]);
+      const parsedArray = Array.isArray(parsed) ? parsed : [parsed];
+      parsedArray.forEach((card: any) => {
+        if ((card.category || card.type) && card.title) {
+          cards.push({
+            category: (card.category || card.type).toLowerCase() as ContentCategory,
+            title: card.title,
+            content: card.content || card.title,
+            tags: card.tags || [],
+            items: card.items,
+            hasAttachment: card.hasAttachment,
+          });
+        }
+      });
     } catch (e) {
       console.error('Failed to parse JSON array from markdown codeblock:', e);
     }
@@ -193,9 +192,9 @@ export function extractNewCardsFromResponse(response: string): Array<{
       const parsedArray = JSON.parse(arrayMatch[0]);
       if (Array.isArray(parsedArray)) {
         parsedArray.forEach((card: any) => {
-          if (card.category && card.title) {
+          if ((card.category || card.type) && card.title) {
             cards.push({
-              category: card.category as ContentCategory,
+              category: (card.category || card.type) as ContentCategory,
               title: card.title,
               content: card.content || card.title,
               tags: card.tags || [],
@@ -207,6 +206,26 @@ export function extractNewCardsFromResponse(response: string): Array<{
       }
     } catch (e) {
       console.error('Failed to parse array JSON cards:', e);
+    }
+  }
+
+  // 尝试提取 JSON 格式3（直接单个对象 {...}）
+  const objectMatch = response.match(/\{\s*"(?:title|category|type|content)"[\s\S]*\}/);
+  if (objectMatch && cards.length === 0) {
+    try {
+      const parsed = JSON.parse(objectMatch[0]);
+      if ((parsed.category || parsed.type) && parsed.title) {
+        cards.push({
+          category: (parsed.category || parsed.type).toLowerCase() as ContentCategory,
+          title: parsed.title,
+          content: parsed.content || parsed.title,
+          tags: parsed.tags || [],
+          items: parsed.items,
+          hasAttachment: parsed.hasAttachment,
+        });
+      }
+    } catch (e) {
+      console.error('Failed to parse JSON object:', e);
     }
   }
 

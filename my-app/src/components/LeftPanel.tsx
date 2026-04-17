@@ -832,7 +832,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       ))}
 
       {/* Sections */}
-      {sections.filter(s => s.id !== 'about').map((section) => {
+      {mounted && sections.filter(s => s.id !== 'about').map((section) => {
         const displayCards = section.cards.filter(card => !card.metadata?.isAboutFlowd);
         
         if (displayCards.length === 0) {
@@ -883,7 +883,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       })}
 
       {/* Empty State Hint */}
-      {sections.every(s => s.cards.length === 0) && (
+      {mounted && sections.every(s => s.cards.length === 0) && (
         <div className="mt-12 p-6 bg-white/50 rounded-xl border border-white/60">
           <p className="text-sm text-gray-500 leading-relaxed">
             开始输入你的想法，AI 助手会自动识别并归类到对应板块。

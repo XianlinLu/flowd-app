@@ -196,7 +196,7 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
       const systemPrompt = `你是一个项目总结助手。请根据当前项目的所有卡片内容，生成结构化的项目总结和待解决事项。
 请严格返回 JSON 格式，包含以下两个字段：
 {
-  "summary": "包含以下六个段落的文本，必须严格使用 markdown 格式分段，段落标题必须用加粗的英文星号包围，不要使用特殊字符前缀，不要有多余换行：\\n**How it began**\\n这里写内容...\\n\\n**How it evolved**\\n这里写内容...\\n\\n**What was explored and discarded**\\n这里写内容...\\n\\n**What was decided**\\n这里写内容...\\n\\n**Output & Results**\\n这里写内容...\\n\\n**Current Status**\\n这里写内容...",
+  "summary": "包含以下六个段落的文本，必须严格使用 markdown 格式分段，段落标题必须用加粗的星号包围，不要使用特殊字符前缀，不要有多余换行：\\n**项目如何开始**\\n这里写内容...\\n\\n**项目如何演变**\\n这里写内容...\\n\\n**探索过及放弃的内容**\\n这里写内容...\\n\\n**已决定的内容**\\n这里写内容...\\n\\n**产出成果**\\n这里写内容...\\n\\n**目前进展**\\n这里写内容...",
   "todos": ["待办事项1", "待办事项2"]
 }
 绝对不要输出除 JSON 之外的任何内容。如果看板为空，请生成一个默认的空总结。`;
@@ -1226,8 +1226,14 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                     )}
                     
                     <div className="flex items-start gap-3">
-                      <input type="checkbox" className="mt-1 w-4 h-4 rounded-sm border-gray-300 text-gray-600 focus:ring-gray-500" />
-                      <span className="text-[14px] text-gray-500">我了解这些事项将在归档文档中作为未解决项保留。</span>
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <div className="relative flex items-center justify-center mt-0.5">
+                          <input type="checkbox" className="peer sr-only" defaultChecked />
+                          <div className="w-4 h-4 border-2 border-gray-300 rounded-sm bg-white peer-checked:bg-[#1D1D1D] peer-checked:border-[#1D1D1D] transition-colors"></div>
+                          <svg className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <span className="text-[14px] text-gray-500">我了解这些事项将在归档文档中作为未解决项保留。</span>
+                      </label>
                     </div>
                   </div>
                 )}
@@ -1267,7 +1273,8 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
                     }
                   }
                 }}
-                className="px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-colors bg-[#8c8e8c] hover:bg-gray-500 shadow-sm uppercase tracking-wider"
+                className="px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-colors hover:bg-black/80 shadow-sm uppercase tracking-wider"
+                style={{ backgroundColor: '#1D1D1D' }}
                 disabled={isWrapUpLoading}
               >
                 确认归档

@@ -616,8 +616,80 @@ export function ChatPanel({
     return { isMatch: false, isDecision: false };
   };
 
-  // Auto save user idea to board (Temporarily disabled per user request: "左边卡片看板中的卡片不能和右边agent对话聊天的卡片内容重复")
+  // Auto save user idea to board
   const autoSaveIdeaToBoard = async (content: string, file: File | null): Promise<boolean> => {
+    const { isMatch } = isIdeaOrDecision(content);
+    const hasImageAndInstruction = file && file.type.startsWith('image/') && content.trim().length > 0;
+    
+    if (!isMatch && !hasImageAndInstruction) {
+      return false;
+    }
+
+    try {
+      const systemPrompt = `你是一个智能项目助手。
+用户刚刚表达了一个想法、需求，或者上传了一张带有说明的图片。
+请你自动提取并归纳为一个卡片，并根据用户的实际情况将其分类到最合适的看板大类中。
+可用的看板大类 (sectionId) 有：
+1. 'onboarding' (前期构思与调研：项目初期的想法、探索与决定)
+2. 'workspace' (落地执行与设计：核心工作区结构与布局、开发执行任务)
+3. 'office_efficiency' (辅助办公与效率：日常办公、会议记录、Bug追踪、文档等)
+
+请直接输出 JSON，不要有任何多余解释。格式如下：
+\`\`\`json
+{
+  "title": "简短的卡片标题",
+  "content": "卡片的详细内容或用户想法的整理",
+  "category": "note",
+  "sectionId": "onboarding"
+}
+\`\`\`
+注意：为了满足用户“加上笔记卡片”的需求，生成的 category 必须为 'note'。`;
+
+      const msgContent = `用户的输入是：${content}\n${file ? `用户还上传了一张图片：${file.name}，类型为：${file.type}` : ''}`;
+      const messages: Message[] = [{ id: 'tmp', role: 'user', content: msgContent, timestamp: Date.now() }];
+      
+      let fullContent = '';
+      for await (const chunk of streamChat(messages, systemPrompt)) {
+        fullContent += chunk;
+      }
+      
+      const jsonMatch = fullContent.match(/```json\s*([\s\S]*?)```/) || fullContent.match(/{[\s\S]*?}/);
+      if (jsonMatch) {
+        const data = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+        
+        let fileUrl = '';
+        if (file) {
+          fileUrl = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.onerror = () => resolve(URL.createObjectURL(file));
+            reader.readAsDataURL(file);
+          });
+        }
+        
+        boardStore.addCard(data.category || 'note', {
+          title: data.title || '新想法',
+          content: data.content || content,
+          metadata: {
+            aiGenerated: true,
+            ...(file ? {
+              attachment: {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                url: fileUrl
+              }
+            } : {})
+          }
+        }, data.sectionId);
+        
+        // Return true to show the notification
+        return true;
+      }
+    } catch (e) {
+      console.error('Auto save idea failed', e);
+    }
+    
     return false;
   };
 

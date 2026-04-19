@@ -7,6 +7,7 @@ import { toast } from '@/lib/toast';
 import { DraggableCard } from './DraggableCard';
 import { FlowdCard } from './FlowdCard';
 import { ExpandedBoard } from './ExpandedBoard';
+import { FeishuFolderSelectModal } from './FeishuFolderSelectModal';
 
 interface LeftPanelProps {
   projectName?: string;
@@ -36,6 +37,8 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
   const [isWrapUpModalOpen, setIsWrapUpModalOpen] = useState(false);
   const [deleteConfirmCardId, setDeleteConfirmCardId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
+  const [syncTarget, setSyncTarget] = useState<{ type: 'card' | 'creation', cardId?: string, formData?: any, category?: string } | null>(null);
   
   // Todo Modal State
   const [todoTitle, setTodoTitle] = useState('');
@@ -258,6 +261,79 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
     return null;
   }
 
+  const handleConfirmSync = async (folderToken: string) => {
+    setSyncModalOpen(false);
+    if (!syncTarget) return;
+
+    if (syncTarget.type === 'card' && syncTarget.cardId) {
+      const card = boardStore.getAllCards().find(c => c.id === syncTarget.cardId);
+      if (card) {
+        try {
+          boardStore.updateCard(card.id, { status: 'syncing' });
+          const response = await fetch('/api/feishu/sync-card', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: card.title,
+              content: card.content,
+              category: card.category,
+              folderToken
+            })
+          });
+          
+          const data = await response.json();
+          if (data.success) {
+            boardStore.updateCard(card.id, { 
+              status: 'synced',
+              metadata: {
+                ...card.metadata,
+                feishuDocUrl: data.url
+              }
+            });
+            toast.success('同步成功！已将卡片同步至飞书');
+          } else {
+            const errorMsg = data.details || data.error || '未知错误';
+            boardStore.updateCard(card.id, { 
+              status: 'sync_failed',
+              metadata: { ...card.metadata, syncError: errorMsg }
+            });
+            toast.error(`同步失败: ${errorMsg}`);
+          }
+        } catch (err: any) {
+          const errorMsg = err.message || '网络或服务器错误';
+          boardStore.updateCard(card.id, { 
+            status: 'sync_failed',
+            metadata: { ...card.metadata, syncError: errorMsg }
+          });
+          toast.error(`同步请求失败: ${errorMsg}`);
+        }
+      }
+    } else if (syncTarget.type === 'creation' && syncTarget.formData) {
+      try {
+        toast.info('正在同步至飞书...');
+        const response = await fetch('/api/feishu/sync-card', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: syncTarget.formData.title,
+            content: JSON.stringify(syncTarget.formData, null, 2),
+            category: syncTarget.category,
+            folderToken
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          toast.success('同步成功！已将内容同步至飞书');
+        } else {
+          toast.error(`同步失败: ${data.error || '未知错误'}`);
+        }
+      } catch (err) {
+        toast.error('同步请求失败，请检查网络或控制台日志。');
+      }
+      setCreationModalType(null);
+    }
+  };
+
   if (isExpanded) {
     return (
       <div 
@@ -347,49 +423,10 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             <div className="h-px bg-gray-200/50 my-1"></div>
             
             <button 
-              onClick={async () => {
+              onClick={() => {
                 if (contextMenu.cardId) {
-                  const card = boardStore.getAllCards().find(c => c.id === contextMenu.cardId);
-                  if (card) {
-                    try {
-                      boardStore.updateCard(card.id, { status: 'syncing' });
-                      const response = await fetch('/api/feishu/sync-card', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          title: card.title,
-                          content: card.content,
-                          category: card.category
-                        })
-                      });
-                      
-                      const data = await response.json();
-                      if (data.success) {
-                        boardStore.updateCard(card.id, { 
-                          status: 'synced',
-                          metadata: {
-                            ...card.metadata,
-                            feishuDocUrl: data.url
-                          }
-                        });
-                        toast.success('同步成功！已将卡片同步至飞书');
-                      } else {
-                        const errorMsg = data.details || data.error || '未知错误';
-                        boardStore.updateCard(card.id, { 
-                          status: 'sync_failed',
-                          metadata: { ...card.metadata, syncError: errorMsg }
-                        });
-                        toast.error(`同步失败: ${errorMsg}`);
-                      }
-                    } catch (err: any) {
-                      const errorMsg = err.message || '网络或服务器错误';
-                      boardStore.updateCard(card.id, { 
-                        status: 'sync_failed',
-                        metadata: { ...card.metadata, syncError: errorMsg }
-                      });
-                      toast.error(`同步请求失败: ${errorMsg}`);
-                    }
-                  }
+                  setSyncTarget({ type: 'card', cardId: contextMenu.cardId });
+                  setSyncModalOpen(true);
                 }
                 setContextMenu(null);
               }}
@@ -615,27 +652,13 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
 
             <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
               <button 
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/feishu/sync-card', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        title: creationFormData.title,
-                        content: JSON.stringify(creationFormData, null, 2),
-                        category: creationModalType
-                      })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                      toast.success('同步成功！已将内容同步至飞书');
-                    } else {
-                      toast.error(`同步失败: ${data.error || '未知错误'}`);
-                    }
-                  } catch (err) {
-                    toast.error('同步请求失败，请检查网络或控制台日志。');
-                  }
-                  setCreationModalType(null);
+                onClick={() => {
+                  setSyncTarget({
+                    type: 'creation',
+                    formData: creationFormData,
+                    category: creationModalType
+                  });
+                  setSyncModalOpen(true);
                 }}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
               >
@@ -776,6 +799,12 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             </div>
           </div>
         )}
+
+        <FeishuFolderSelectModal 
+          isOpen={syncModalOpen}
+          onClose={() => setSyncModalOpen(false)}
+          onConfirm={handleConfirmSync}
+        />
       </div>
     );
   }
@@ -972,49 +1001,10 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
           <div className="h-px bg-gray-200/50 my-1"></div>
           
           <button 
-              onClick={async () => {
+              onClick={() => {
                 if (contextMenu.cardId) {
-                  const card = boardStore.getAllCards().find(c => c.id === contextMenu.cardId);
-                  if (card) {
-                    try {
-                      boardStore.updateCard(card.id, { status: 'syncing' });
-                      const response = await fetch('/api/feishu/sync-card', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          title: card.title,
-                          content: card.content,
-                          category: card.category
-                        })
-                      });
-                      
-                      const data = await response.json();
-                      if (data.success) {
-                        boardStore.updateCard(card.id, { 
-                          status: 'synced',
-                          metadata: {
-                            ...card.metadata,
-                            feishuDocUrl: data.url
-                          }
-                        });
-                        toast.success('同步成功！已将卡片同步至飞书');
-                      } else {
-                        const errorMsg = data.details || data.error || '未知错误';
-                        boardStore.updateCard(card.id, { 
-                          status: 'sync_failed',
-                          metadata: { ...card.metadata, syncError: errorMsg }
-                        });
-                        toast.error(`同步失败: ${errorMsg}`);
-                      }
-                    } catch (err: any) {
-                      const errorMsg = err.message || '网络或服务器错误';
-                      boardStore.updateCard(card.id, { 
-                        status: 'sync_failed',
-                        metadata: { ...card.metadata, syncError: errorMsg }
-                      });
-                      toast.error(`同步请求失败: ${errorMsg}`);
-                    }
-                  }
+                  setSyncTarget({ type: 'card', cardId: contextMenu.cardId });
+                  setSyncModalOpen(true);
                 }
                 setContextMenu(null);
               }}
@@ -1430,8 +1420,12 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
             <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
               <button 
                 onClick={() => {
-                  toast.info('已发起同步请求...');
-                  // Simulate sync and close
+                  setSyncTarget({
+                    type: 'creation',
+                    formData: creationFormData,
+                    category: creationModalType
+                  });
+                  setSyncModalOpen(true);
                 }}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1.5"
               >
@@ -1484,6 +1478,11 @@ export function LeftPanel({ projectName = '新项目', onCardCountChange, onCard
           </div>
         </div>
       )}
+      <FeishuFolderSelectModal 
+        isOpen={syncModalOpen}
+        onClose={() => setSyncModalOpen(false)}
+        onConfirm={handleConfirmSync}
+      />
     </div>
   );
 }

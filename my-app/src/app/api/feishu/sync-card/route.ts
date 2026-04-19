@@ -3,7 +3,7 @@ import { getFeishuClient } from '@/lib/feishu-client';
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, category } = await request.json();
+    const { title, content, category, folderToken } = await request.json();
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 调用 FeishuClient 原生的 createDocument 接口
-    const result = await client.createDocument(docTitle, content);
+    const result = await client.createDocument(docTitle, content, folderToken);
 
     return NextResponse.json({
       success: true,

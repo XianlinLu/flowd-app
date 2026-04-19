@@ -147,6 +147,22 @@ export class FeishuClient {
   }
 
   // Document Operations
+  async getFolders(): Promise<Array<{ token: string; name: string }>> {
+    try {
+      const response = await this.request('/drive/v1/files?direction=DESC&order_by=EditedTime');
+      const files = response.data?.files || [];
+      return files
+        .filter((file: any) => file.type === 'folder')
+        .map((folder: any) => ({
+          token: folder.token,
+          name: folder.name,
+        }));
+    } catch (e) {
+      console.error('Failed to get folders:', e);
+      return [];
+    }
+  }
+
   async getDocument(documentId: string): Promise<{ document: { title: string; document_id: string } }> {
     const response = await this.request(`/docx/v1/documents/${documentId}`);
     return response.data;

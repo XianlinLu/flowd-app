@@ -2,7 +2,7 @@ import { OpenAI } from 'openai';
 
 // We can reuse the LLM_API_KEY if it supports OpenAI-compatible embeddings 
 // (like deepseek or others), or fallback to OpenAI
-const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY;
+const apiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY || 'dummy_key_for_build';
 const baseURL = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
 
 const openai = new OpenAI({

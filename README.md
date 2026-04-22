@@ -15,30 +15,6 @@ Flowd 是一款基于 Next.js 开发的 AI 助手与工作流管理应用，集�
 3. **CI/CD 自动部署**
    已在 IGA Pages 控制台中绑定了 GitHub 仓库。**任何对 `main` 分支的 Push 都会自动触发构建和发布，实现“推送即上线”。**
 
-### 🔑 环境变量配置 (Environment Variables)
-
-如果你要在本地运行或在 IGA Pages 等平台上重新部署，必须配置以下环境变量（在云端控制台或本地的 `.env.local` 文件中）：
-
-```env
-# --- 大模型配置 (LLM Configuration) ---
-# 必须：用于调用大语言模型（如 DeepSeek-Chat）
-LLM_API_KEY=your_llm_api_key_here
-LLM_BASE_URL=https://api.deepseek.com
-# 可选：如果使用的是 OpenAI 兼容接口，在代码构建时也有 fallback 处理
-OPENAI_API_KEY=your_openai_api_key_here
-
-# --- 飞书配置 (Feishu Integration) ---
-# 用于实现飞书云文档和多维表格数据的拉取与同步
-FEISHU_APP_ID=your_feishu_app_id
-FEISHU_APP_SECRET=your_feishu_app_secret
-
-# --- 系统配置 (System) ---
-NEXT_PUBLIC_URL=https://your-production-domain.com # 线上替换为你实际的预览或自定义域名
-DEFAULT_MODEL=deepseek-chat
-```
-
-> **注意**：如果在构建时（如 `npm run build`）缺少 `OPENAI_API_KEY` 或 `LLM_API_KEY`，项目代码中已设置了自动降级处理（`dummy_key_for_build`），确保能顺利完成静态生成。但在实际运行和访问接口时，必须保证环境变量生效。
-
 ## 🛠 本地开发 (Getting Started)
 
 1. 克隆仓库并安装依赖：
